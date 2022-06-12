@@ -638,7 +638,7 @@ public class Utils {
             if (end_idx <= sig.length - 1) {
                 double[] cand_sig = Utils.segment(sig, start_idx, end_idx);
                 double[] spec = Utils.mag2db(Utils.fftnative_double(cand_sig, cand_sig.length));
-                int[] freqs = FeedbackSignal.getFreqs(spec);
+                int[] freqs = FeedbackSignal.decodeFeedbackSignal(spec);
                 Log.e("cands_fre", freqs[0] + "," + freqs[1]);
 
                 FileOperations.appendtofile(MainActivity.av, freqs[0]+","+freqs[1]+"\n",

@@ -3,7 +3,7 @@ package com.example.root.ffttest2;
 public class PreambleGen {
 
     public static short[] sounding_signal_s() {
-        return SymbolGeneration.generate(Constants.pn60_bits, Constants.valid_carrier_data,
+        return SymbolGeneration.generatePreamble(Constants.pn60_bits, Constants.valid_carrier_data,
                 Constants.chanest_symreps, true, Constants.SignalType.Sounding); }
 
     public static short[] preamble_s() {

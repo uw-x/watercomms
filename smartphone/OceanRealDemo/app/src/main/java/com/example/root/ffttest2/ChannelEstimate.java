@@ -133,6 +133,7 @@ public class ChannelEstimate {
                                 MainActivity.av.getResources().getColor(R.color.purple_500), "Symbol");
                     }
                     cc+=Constants.Ns+Constants.Cp;
+                    break;
                 }
             }
         });
