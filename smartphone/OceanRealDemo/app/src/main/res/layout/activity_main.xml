@@ -1032,6 +1032,7 @@
         android:layout_height="wrap_content"
         android:text="Listening"
         android:checked="true"
+        android:visibility="gone"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/textView" />
 

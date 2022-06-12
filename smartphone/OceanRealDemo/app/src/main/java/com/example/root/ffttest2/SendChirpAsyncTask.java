@@ -22,16 +22,6 @@ public class SendChirpAsyncTask extends AsyncTask<Void, Void, Void> {
     @Override
     protected void onPreExecute() {
         super.onPreExecute();
-        Utils.log("---------------------------------------");
-        Log.e(LOG, "preexec ");
-//        Constants.toggleUI(false);
-
-//        Constants.gview.removeAllSeries();
-//        Constants.gview2.removeAllSeries();
-//        Constants.gview3.removeAllSeries();
-//        Constants.gview.setTitle("");
-//        Constants.gview2.setTitle("");
-//        Constants.gview3.setTitle("");
     }
 
     public void setupTimer() {
@@ -50,7 +40,6 @@ public class SendChirpAsyncTask extends AsyncTask<Void, Void, Void> {
                     Constants.AliceTime = (int)totalTime;
                     totalTime *= 1000;
                     totalTime *= num_measurements;
-                    Log.e("time","Alice time "+Constants.AliceTime);
 
                     totalTime += 1000+(Constants.initSleep*1000);
                 }
@@ -68,16 +57,6 @@ public class SendChirpAsyncTask extends AsyncTask<Void, Void, Void> {
                     totalTime *= num_measurements;
                     totalTime += 1000+(Constants.initSleep*1000);
                 }
-
-                Log.e(LOG,"Total time "+totalTime);
-//                Constants.timer = new CountDownTimer((int)totalTime, 1000) {
-//                    public void onTick(long millisUntilFinished) {
-//                        Constants.tv4.setText((millisUntilFinished/1000)+"");
-//                    }
-//
-//                    public void onFinish() {
-//                    }
-//                }.start();
             }
         });
     }
@@ -87,9 +66,6 @@ public class SendChirpAsyncTask extends AsyncTask<Void, Void, Void> {
         super.onPostExecute(unused);
 
         MainActivity.unreg(av);
-        Log.e(LOG, "postexec ");
-
-//        Constants.toggleUI(true);
 
         if (Constants.timer!=null) {
             Constants.timer.cancel();
@@ -109,41 +85,9 @@ public class SendChirpAsyncTask extends AsyncTask<Void, Void, Void> {
         Constants.WaitForBerTime = Constants.WaitForBerTimeDefault + Constants.SyncLag;
         Constants.WaitForPerTime = Constants.WaitForPerTimeDefault + Constants.SyncLag;
 
-        if (Constants.exp_num==1||Constants.exp_num==2) {
-            Constants.SEND_DATA=true;
-            Constants.WaitForDataTime = Constants.WaitForBerTime;
-            if (Constants.exp_num == 1) {
-//                Constants.FreAdaptScaleFactor = 1;
-                Constants.AdaptationMethod = 3;
-//                Constants.preambleTime = 100;
-            }
-            else {
-//                Constants.FreAdaptScaleFactor = .75;
-                Constants.AdaptationMethod = 3;
-//                Constants.preambleTime = 100;
-            }
-        }
-        else if (Constants.exp_num==3||Constants.exp_num==4||Constants.exp_num==5) {
-            Constants.SEND_DATA=true;
-            Constants.WaitForDataTime = Constants.WaitForPerTime;
-            if (Constants.exp_num == 3) {
-                Constants.AdaptationMethod = 2;
-//                Constants.preambleTime = 100;
-            }
-            else if (Constants.exp_num == 4) {
-                Constants.AdaptationMethod = 3;
-//                Constants.preambleTime = 100;
-            }
-            else if (Constants.exp_num == 5) {
-                Constants.AdaptationMethod = 3;
-//                Constants.preambleTime = 200;
-            }
-        }
-        else if (Constants.exp_num==6) {
-            Constants.AdaptationMethod = 3;
-            Constants.SEND_DATA=false;
-//            Constants.preambleTime = 100;
-        }
+        Constants.SEND_DATA=true;
+        Constants.WaitForDataTime = Constants.WaitForPerTime;
+        Constants.AdaptationMethod = 3;
 
         FileOperations.writetofile(MainActivity.av, Constants.SNR_THRESH2+"\n"+Constants.FreAdaptScaleFactor+"\n"+Constants.SNR_THRESH2_2,
                 Utils.genName(Constants.SignalType.AdaptParams,0)+".txt");
@@ -151,8 +95,6 @@ public class SendChirpAsyncTask extends AsyncTask<Void, Void, Void> {
         setupTimer();
 
         sleep(Constants.initSleep * 1000);
-
-//        updateTimer("0");
 
         Constants.StartingTimestamp = System.currentTimeMillis();
         appendToLog(Constants.SignalType.Start.toString());
@@ -230,34 +172,12 @@ public class SendChirpAsyncTask extends AsyncTask<Void, Void, Void> {
             double[] xcorr_out = Utils.xcorr_online(tx_preamble, seg, seg, Constants.SignalType.Feedback);
 
             int[] valid_bins = FeedbackSignal.extractSignalHelper(feedback_signal, (int)xcorr_out[1], m_attempt);
-            Log.e("fifo","valid bins "+valid_bins.length);
-            for (int i = 0; i <valid_bins.length; i++) {
-                Log.e("fifo",valid_bins[i]+"");
-            }
 
             if (Constants.SEND_DATA) {
                 appendToLog(Constants.SignalType.Data.toString());
                 if (valid_bins.length >= 1 && valid_bins[0] != -1) {
                     sendData(valid_bins, m_attempt);
                 }
-//                else {
-//                    if (Constants.Ns==960) {
-//                        sendData(new int[]{20,21}, m_attempt);
-//                    }
-//                    else if (Constants.Ns==1920) {
-//                        sendData(new int[]{40}, m_attempt);
-//                    }
-//                    else if (Constants.Ns==4800) {
-//                        sendData(new int[]{100}, m_attempt);
-//                    }
-//                    else if (Constants.Ns==9600) {
-//                        sendData(new int[]{200}, m_attempt);
-//                    }
-//                }
-
-                // bob's window for receiving data is longer than time for alice to send data
-                // wait for a bit so that they both start at similar times
-
                 try {
                     Thread.sleep(3000);
                 }
@@ -272,10 +192,7 @@ public class SendChirpAsyncTask extends AsyncTask<Void, Void, Void> {
             int[] valid_bins = null;
             double[] sounding_signal = null;
             do {
-//                Log.e("fifo","work bob");
-//                Log.e("timer","wait for chirp "+m_attempt+","+chirpLoopNumber);
                 sounding_signal = Utils.waitForChirp(Constants.SignalType.Sounding, m_attempt, chirpLoopNumber);
-//                Log.e("timer","finish wait for chirp "+(sounding_signal==null));
                 if (sounding_signal == null) {
                     return -1;
                 }
@@ -284,20 +201,12 @@ public class SendChirpAsyncTask extends AsyncTask<Void, Void, Void> {
                 double[] xcorr_out = Utils.xcorr_online(tx_preamble, seg, seg, Constants.SignalType.Sounding);
 
                 valid_bins = ChannelEstimate.extractSignal_withsymbol_helper(av, sounding_signal, (int)xcorr_out[1], m_attempt);
-                Log.e("fifo", "valid bins " + valid_bins.length);
-                for (int i = 0; i < valid_bins.length; i++) {
-                    Log.e("fifo", valid_bins[i] + "");
-                }
                 chirpLoopNumber++;
 
                 if (!Constants.work) {
                     return -1;
                 }
-            } while (valid_bins == null || valid_bins.length == 0 || valid_bins[0] == -1); // ? why valid bin == null, it should be valid_bins[0] == -1
-
-//            if (Constants._OfflineRecorder!=null) {
-//                Constants._OfflineRecorder.halt2();
-//            }
+            } while (valid_bins == null || valid_bins.length == 0 || valid_bins[0] == -1);
 
             short[] feedback = FeedbackSignal.multi_freq_signal(valid_bins[0], valid_bins[valid_bins.length - 1],
                     Constants.fbackTime, true, m_attempt);
@@ -312,7 +221,6 @@ public class SendChirpAsyncTask extends AsyncTask<Void, Void, Void> {
             double[] data_signal = null;
             if (Constants.SEND_DATA) {
                 data_signal = Utils.waitForChirp(Constants.SignalType.DataRx, m_attempt, 0);
-//                Utils.isSoundingSignal(MainActivity.av,sig);
             }
             if (data_signal!=null) {
                 Decoder.decode_helper(av, data_signal, valid_bins);
@@ -356,30 +264,21 @@ public class SendChirpAsyncTask extends AsyncTask<Void, Void, Void> {
         if (sigType.equals(Constants.SignalType.DataAdapt)) {
             FileOperations.writetofile(MainActivity.av, txsig,
                     Utils.genName(Constants.SignalType.DataAdapt, m_attempt) + ".txt");
-//            FileOperations.writetofile(MainActivity.av, Utils.trim(Arrays.toString(bits)),
-//                    Utils.genName(Constants.SignalType.BitsAdapt, m_attempt) + ".txt");
         }
         else if (sigType.equals(Constants.SignalType.DataFull_1000_4000)) {
             FileOperations.writetofile(MainActivity.av, txsig,
                     Utils.genName(Constants.SignalType.DataFull_1000_4000, m_attempt) + ".txt");
-//            FileOperations.writetofile(MainActivity.av, Utils.trim(Arrays.toString(bits)),
-//                    Utils.genName(Constants.SignalType.BitsFull_1000_4000, m_attempt)+".txt");
         }
         else if (sigType.equals(Constants.SignalType.DataFull_1000_2500)) {
             FileOperations.writetofile(MainActivity.av, txsig,
                     Utils.genName(Constants.SignalType.DataFull_1000_2500, m_attempt) + ".txt");
-//            FileOperations.writetofile(MainActivity.av, Utils.trim(Arrays.toString(bits)),
-//                    Utils.genName(Constants.SignalType.BitsFull_1000_2500, m_attempt)+".txt");
         }
         else if (sigType.equals(Constants.SignalType.DataFull_1000_1500)) {
             FileOperations.writetofile(MainActivity.av, txsig,
                     Utils.genName(Constants.SignalType.DataFull_1000_1500, m_attempt) + ".txt");
-//            FileOperations.writetofile(MainActivity.av, Utils.trim(Arrays.toString(bits)),
-//                    Utils.genName(Constants.SignalType.BitsFull_1000_1500, m_attempt)+".txt");
         }
 
         Constants.sp1 = new AudioSpeaker(MainActivity.av, txsig, Constants.fs, 0, txsig.length, false);
-//        Constants.sp1.write(txsig);
         Constants.sp1.play(Constants.volume);
 
         int sleepTime = (int) (((double) txsig.length / Constants.fs) * 1000);
@@ -430,18 +329,6 @@ public class SendChirpAsyncTask extends AsyncTask<Void, Void, Void> {
         // calc bits//////////////////////////////////////////////
         int msgbits = 16;
         int traceDepth = 0;
-//        if (Constants.codeRate.equals(Constants.CodeRate.None)) {
-////            msgbits *= 2;
-////            traceDepth = 20;
-//        }
-//        else if (Constants.codeRate.equals(Constants.CodeRate.C1_2)) {
-//            msgbits *= 2;
-//            traceDepth = 20;
-//        }
-//        else if (Constants.codeRate.equals(Constants.CodeRate.C2_3)) {
-//            msgbits *= 1.5;
-//            traceDepth = 24;
-//        }
         msgbits += traceDepth;
 
         // adapt//////////////////////////////////////////////
@@ -450,35 +337,6 @@ public class SendChirpAsyncTask extends AsyncTask<Void, Void, Void> {
                 Constants.SignalType.DataAdapt, Constants.ExpType.PER);
         Log.e("numbits","adapt "+msgbits);
         // full bandwidth//////////////////////////////////////////////
-//        int[] end_bins = null;
-//        int bbin=0;
-//        if (Constants.Ns==960) {
-//            end_bins = new int[]{79,49,29};
-//            bbin=20;
-//        }
-//        else if (Constants.Ns==1920) {
-//            end_bins = new int[]{159,99,59};
-//            bbin=40;
-//        }
-//        else if (Constants.Ns==4800) {
-//            end_bins = new int[]{397,247,147};
-//            bbin=100;
-//        }
-//        else if (Constants.Ns==9600) {
-//            end_bins = new int[]{795,495,295};
-//            bbin=200;
-//        }
-//        Constants.SignalType[] sigTypes = new Constants.SignalType[]{
-//                Constants.SignalType.DataFull_1000_4000,
-//                Constants.SignalType.DataFull_1000_2500,
-//                Constants.SignalType.DataFull_1000_1500,
-//        };
-//        for (int i = 0; i < end_bins.length; i++) {
-//            int[] bins = generateBins(bbin, end_bins[i]);
-//            Log.e("numbits","full "+end_bins[i]+","+msgbits);
-//            send_data_helper(msgbits, bins, m_attempt,
-//                    sigTypes[i], Constants.ExpType.PER);
-//        }
     }
 
     public static void sleep(int s) {

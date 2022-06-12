@@ -874,8 +874,7 @@ public class Utils {
                         double[] xcorr_out = Utils.xcorr_online(tx_preamble, filt, out, sigType);
 
                         long t1 = System.currentTimeMillis();
-                        Utils.log(String.format("xcorr out %.0f,%.0f (%.2f)",xcorr_out[0],xcorr_out[1],xcorr_out[2]));
-//                        Constants.time = t1;
+                        Utils.log(String.format("Listening... (%.2f)",xcorr_out[2]));
 
                         sampleHistory.add(rec);
                         valueHistory.add(xcorr_out[0]);

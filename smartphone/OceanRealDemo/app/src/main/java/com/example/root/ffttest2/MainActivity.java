@@ -70,8 +70,6 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         sensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
         accelerometer = sensorManager.getDefaultSensor(Sensor.TYPE_LINEAR_ACCELERATION);
         gyroscope = sensorManager.getDefaultSensor(Sensor.TYPE_GYROSCOPE);
-//        sensorManager.registerListener(this, accelerometer, SensorManager.SENSOR_DELAY_FASTEST);
-//        sensorManager.registerListener(this, gyroscope, SensorManager.SENSOR_DELAY_FASTEST);
 
         KeyboardVisibilityEvent.setEventListener(
                 this,
@@ -86,18 +84,7 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
                 perms,
                 1234);
         Constants.setup(this);
-//        double[] out=ChirpGen.preamble_d();
-//        testme();
-//        Tests.feedback_test();
-//        Tests.corr_test();
-//        Tests.test_decode();
-//        Tests.naiser_test();
-//        Tests.sounding_test();
-//        ChirpGen.sounding_signal_s();
-//        Tests.bin_filling();
-//        Decoder.test_decode(this);
-//        Tests.freq_expand();
-//        Tests.shuffle();
+
         Constants.tts = new TextToSpeech(MainActivity.this, new TextToSpeech.OnInitListener() {
 
             @Override
@@ -118,59 +105,6 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
             Constants.user  = Constants.User.Bob;
             startMethod(this);
         }
-    }
-
-    public static void testme() {
-//        double totalTime = 0;
-//        Constants.WaitForFeedbackTime = Constants.WaitForFeedbackTimeDefault + Constants.SyncLag;
-//        Constants.WaitForSoundingTime = Constants.WaitForSoundingTimeDefault + Constants.SyncLag - Constants.SoundingOffset;
-//        Constants.WaitForBerTime = Constants.WaitForBerTimeDefault + Constants.SyncLag;
-//        Constants.WaitForPerTime = Constants.WaitForPerTimeDefault + Constants.SyncLag;
-//        Constants.WaitForDataTime = Constants.WaitForPerTime;
-//
-//        double soundingTimeTx = 1;
-//        double extractionFeedbackTime = 1;
-//        totalTime += (soundingTimeTx + Constants.WaitForFeedbackTime +
-//                extractionFeedbackTime);
-//        if (Constants.SEND_DATA) {
-//            totalTime+=Constants.WaitForDataTime;
-//        }
-//        Constants.AliceTime = (int)totalTime;
-//
-//        totalTime=0;
-//        int extractSoundingTime = 1;
-//        int sendFeedbackTime = 1;
-//        totalTime += Constants.WaitForSoundingTime+
-//                extractSoundingTime+sendFeedbackTime;
-//        totalTime += Constants.SoundingOffset;
-//        if (Constants.SEND_DATA) {
-//            totalTime+=Constants.WaitForDataTime;
-//        }
-//        Constants.BobTime = (int)totalTime;
-
-
-
-//        totalTime *= 1000;
-//        Constants.BobTime = totalTime/1000;
-//        //5 symbols, 2 bins
-//        double [][][] spect = {
-//                {{-1,2,-3,2,1.5}, {1,2,2,1, -1}}, //real
-//                {{-2,2,-2,2.5,1.5}, {2,1,1,1,-1 }} //imaginary
-//        };
-//
-//        //5 symbols, 2 bins
-//        double [][] gt = {
-//                {-1, 1, -1, 1,1}, {1,1,1,1,-1}
-//        };
-//
-//
-//        double[] f_seq = FileOperations.readrawasset(av, R.raw.f_seq, 1);
-//        double[] SNR = FileOperations.readrawasset(av, R.raw.snr, 1);
-//        long t1 = System.currentTimeMillis();
-//        double[] test = SNR_freq.calculate_snr(spect, gt);
-//        double[] selected = Fre_adaptation.select_fre_bins2(SNR, f_seq, 6);
-//        Log.e("time",(System.currentTimeMillis()-t1)+"");
-//        select_fre_bins
     }
 
     public void uiSetup() {
