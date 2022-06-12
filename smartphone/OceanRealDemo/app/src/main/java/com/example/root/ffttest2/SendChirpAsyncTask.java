@@ -1,13 +1,10 @@
 package com.example.root.ffttest2;
 
-import static com.example.root.ffttest2.Constants.LOG;
 import static com.example.root.ffttest2.Constants.tv4;
 
 import android.app.Activity;
 import android.os.AsyncTask;
-import android.os.CountDownTimer;
 import android.util.Log;
-import android.view.View;
 
 import java.util.Arrays;
 
@@ -146,12 +143,12 @@ public class SendChirpAsyncTask extends AsyncTask<Void, Void, Void> {
     }
 
     public int work(int m_attempt) {
-        double[] tx_preamble = ChirpGen.preamble_d();
+        double[] tx_preamble = PreambleGen.preamble_d();
         if (Constants.user.equals(Constants.User.Alice)) {
             int chirpLoopNumber = 0;
             double[] feedback_signal = null;
             do {
-                short[] sig = ChirpGen.sounding_signal_s();
+                short[] sig = PreambleGen.sounding_signal_s();
                 FileOperations.writetofile(MainActivity.av, sig, Utils.genName(Constants.SignalType.Sounding, m_attempt) + ".txt");
 
                 Constants.sp1 = new AudioSpeaker(av, sig, Constants.fs, 0, sig.length, false);

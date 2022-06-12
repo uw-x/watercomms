@@ -760,8 +760,6 @@ public class Constants {
         nbin2_data = Math.round(f_range[1] / (inc/data_symreps))-1;
         subcarrier_number_data = (nbin2_data - nbin1_data + 1)/data_symreps;
 
-//        nbin1_chanest = 140;
-//        nbin2_chanest = 560;
         nbin1_chanest = nbin1_data * chanest_symreps;
         nbin2_chanest = nbin1_chanest+(subcarrier_number_data*chanest_symreps);
         subcarrier_number_chanest = (nbin2_chanest - nbin1_chanest + 1)/ chanest_symreps;
@@ -770,14 +768,13 @@ public class Constants {
         nbin2_default = Math.round(f_range[1] / inc)-1;
         subcarrier_number_default = (nbin2_default - nbin1_default + 1);
 
-        double[] preamble = ChirpGen.preamble_d();
+        double[] preamble = PreambleGen.preamble_d();
         blocklen = preamble.length + ChirpGap + (sym_len) * Nsyms;
 
         f_seq = new LinkedList<>();
         for (int i = 0; i < Ns; i++) {
             f_seq.add(inc*i);
         }
-        Log.e("asdf","update n bins "+Ns+","+subcarrier_number_data+","+subcarrier_number_chanest+","+subcarrier_number_default);
 
         HashSet<Integer> null_carrier_set = new HashSet<>();
         for (Integer i : null_carrier) {

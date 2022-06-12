@@ -3,9 +3,7 @@ package com.example.root.ffttest2;
 import static com.example.root.ffttest2.Constants.LOG;
 import static com.example.root.ffttest2.Constants.XCORR_MAX_VAL_HEIGHT_FAC;
 import static com.example.root.ffttest2.Constants.fbackTime;
-import static com.example.root.ffttest2.Constants.preamble_spec;
 
-import android.app.Activity;
 import android.app.Notification;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
@@ -18,15 +16,9 @@ import android.util.Log;
 
 import androidx.core.app.NotificationCompat;
 
-import org.apache.commons.math3.util.MathArrays;
-
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Random;
-
-import uk.me.berndporr.iirj.Bessel;
-import uk.me.berndporr.iirj.Butterworth;
 
 public class Utils {
 
@@ -837,7 +829,7 @@ public class Utils {
         }
 
         int N = (int)(timeout*(Constants.fs/Constants.RecorderStepSize));
-        double[] tx_preamble = ChirpGen.preamble_d();
+        double[] tx_preamble = PreambleGen.preamble_d();
 
         ArrayList<Double[]> sampleHistory = new ArrayList<>();
         ArrayList<Double> valueHistory = new ArrayList<>();

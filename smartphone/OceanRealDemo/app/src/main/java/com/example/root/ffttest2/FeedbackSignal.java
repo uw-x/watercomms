@@ -4,7 +4,6 @@ import static com.example.root.ffttest2.Constants.LOG;
 
 import android.util.Log;
 
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.LinkedList;
@@ -16,7 +15,7 @@ public class FeedbackSignal {
         filt = Utils.filter(filt);
         Log.e("asdf","filt run "+(System.currentTimeMillis()-t1)+"");
 
-        double[] preamble = ChirpGen.preamble_d();
+        double[] preamble = PreambleGen.preamble_d();
         t1 = System.currentTimeMillis();
         int start_point = Utils.xcorr(preamble,filt, rec, filt.length,sigType);
 //        if (start_point > Constants.butterworthFiltOffset) {
@@ -42,7 +41,7 @@ public class FeedbackSignal {
     }
 
     public static int[] extractSignalHelper(double[] rec, int start_point, int m_attempt) {
-        double[] preamble = ChirpGen.preamble_d();
+        double[] preamble = PreambleGen.preamble_d();
         int end_point = start_point+preamble.length-1;
         Log.e("extract",start_point+","+end_point+","+rec.length);
         if (end_point-1 > rec.length || start_point < 0) {
@@ -205,7 +204,7 @@ public class FeedbackSignal {
 
         int counter = 0;
         if (preamble) {
-            for (Short s : ChirpGen.preamble_s()) {
+            for (Short s : PreambleGen.preamble_s()) {
                 txsig[counter++] = s;
             }
             counter += Constants.ChirpGap;

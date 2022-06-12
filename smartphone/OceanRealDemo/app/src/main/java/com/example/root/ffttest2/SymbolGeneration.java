@@ -1,25 +1,20 @@
 package com.example.root.ffttest2;
 
 import static com.example.root.ffttest2.Constants.LOG;
-import static com.example.root.ffttest2.Constants.pn20_bits;
 
 import android.util.Log;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Random;
 
 public class SymbolGeneration {
     public static short[] generate(short[] bits, int[] valid_carrier,
                                    int symreps, boolean preamble, Constants.SignalType sigType) {
-        Log.e(LOG, "SymbolGeneration_generate");
         int numrounds = 0;
         if (valid_carrier.length > 0) {
             numrounds = (int) Math.ceil((double)bits.length/valid_carrier.length);
         }
-        Log.e("sym",bits.length+","+valid_carrier.length+","+numrounds);
 
-//        int symlen = (Constants.Ns+Constants.Cp)*symreps + Constants.Gi;
         int symlen = (Constants.Ns+Constants.Cp)*symreps + Constants.Gi;
 
         int siglen = symlen*numrounds;
@@ -31,7 +26,7 @@ public class SymbolGeneration {
         int counter = 0;
         if (preamble) {
             // add preamble
-            short[] preamble_sig = ChirpGen.preamble_s();
+            short[] preamble_sig = PreambleGen.preamble_s();
             for (Short s : preamble_sig) {
                 txsig[counter++] = s;
             }
@@ -46,7 +41,6 @@ public class SymbolGeneration {
                 endpoint = bits.length-1;
             }
             short[] bits_seg = Utils.segment(bits,bit_counter,endpoint);
-//            if (Constants.DIFFERENTIAL && i > 0) {
             if (i > 0) {
                 bits_seg = transform_bits(bit_list[i-1], bits_seg);
             }
@@ -62,11 +56,10 @@ public class SymbolGeneration {
                 txsig[counter++] = s;
             }
         }
-        Log.e("time",valid_carrier.length+","+bits.length+","+numrounds+","+(txsig.length/48000.0)+"");
         return txsig;
     }
 
-    public static int[] getMeta(int[] valid_carrier) {
+    public static int[] binFillOrder(int[] valid_carrier) {
         int numrounds = 0;
 
         String temp = "";
@@ -106,7 +99,6 @@ public class SymbolGeneration {
     public static short[] generate2(short[] bits, int[] valid_carrier,
                                    int symreps, boolean preamble, Constants.SignalType sigType,
                                     int m_attempt) {
-        Log.e(LOG, "SymbolGeneration_generate");
         int numrounds = 0;
         if (valid_carrier.length > 0) {
             numrounds = (int) Math.ceil((double)bits.length/valid_carrier.length);
@@ -117,7 +109,6 @@ public class SymbolGeneration {
 
         int siglen = symlen*(numrounds+1);
         if (preamble) {
-//            siglen += ((Constants.chirpPreambleTime/1000.0)*Constants.fs)+Constants.ChirpGap;
             siglen += ((Constants.preambleTime/1000.0)*Constants.fs)+Constants.ChirpGap;
         }
         short[] txsig = new short[siglen];
@@ -125,8 +116,7 @@ public class SymbolGeneration {
         int counter = 0;
         if (preamble) {
             // add preamble
-//            short[] preamble_sig = ChirpGen.chirp_get();
-            short[] preamble_sig = ChirpGen.preamble_s();
+            short[] preamble_sig = PreambleGen.preamble_s();
             for (Short s : preamble_sig) {
                 txsig[counter++] = s;
             }
@@ -136,25 +126,7 @@ public class SymbolGeneration {
         // add training symbol
         short[][] bit_list = new short[numrounds+1][valid_carrier.length];
 
-        short[] training_bits = null;
-        if (Constants.subcarrier_number_default==20) {
-            training_bits = Utils.segment(Constants.pn20_bits, 0, valid_carrier.length - 1);
-        }
-        else if (Constants.subcarrier_number_default==40) {
-            training_bits = Utils.segment(Constants.pn40_bits, 0, valid_carrier.length - 1);
-        }
-        else if (Constants.subcarrier_number_default==60) {
-            training_bits = Utils.segment(Constants.pn60_bits, 0, valid_carrier.length - 1);
-        }
-        else if (Constants.subcarrier_number_default==120) {
-            training_bits = Utils.segment(Constants.pn120_bits, 0, valid_carrier.length - 1);
-        }
-        else if (Constants.subcarrier_number_default==300) {
-            training_bits = Utils.segment(Constants.pn300_bits, 0, valid_carrier.length - 1);
-        }
-        else if (Constants.subcarrier_number_default==600) {
-            training_bits = Utils.segment(Constants.pn600_bits, 0, valid_carrier.length - 1);
-        }
+        short[] training_bits = Utils.segment(Constants.pn60_bits, 0, valid_carrier.length - 1);
 
         short[] symbol = generate_helper(
                 training_bits,
@@ -216,40 +188,14 @@ public class SymbolGeneration {
                 txsig[counter++] = s;
             }
         }
-        Log.e("time",valid_carrier.length+","+bits.length+","+numrounds+","+(txsig.length/48000.0)+"");
 
-        if (sigType.equals(Constants.SignalType.DataAdapt)) {
-            FileOperations.writetofile(MainActivity.av, Utils.trim_end(bitsWithPadding),
-                    Utils.genName(Constants.SignalType.BitsAdapt_Padding, m_attempt) + ".txt");
-            FileOperations.writetofile(MainActivity.av, Utils.trim_end(bitsWithoutPadding),
-                    Utils.genName(Constants.SignalType.BitsAdapt, m_attempt) + ".txt");
-            FileOperations.writetofile(MainActivity.av, Utils.trim_end(numberOfDataBits),
-                    Utils.genName(Constants.SignalType.Bit_Fill_Adapt, m_attempt) + ".txt");
-        }
-        else if (sigType.equals(Constants.SignalType.DataFull_1000_4000)) {
-            FileOperations.writetofile(MainActivity.av, Utils.trim_end(bitsWithPadding),
-                    Utils.genName(Constants.SignalType.BitsFull_1000_4000_Padding, m_attempt) + ".txt");
-            FileOperations.writetofile(MainActivity.av, Utils.trim_end(bitsWithoutPadding),
-                    Utils.genName(Constants.SignalType.BitsFull_1000_4000, m_attempt) + ".txt");
-            FileOperations.writetofile(MainActivity.av, Utils.trim_end(numberOfDataBits),
-                    Utils.genName(Constants.SignalType.Bit_Fill_1000_4000, m_attempt) + ".txt");
-        }
-        else if (sigType.equals(Constants.SignalType.DataFull_1000_2500)) {
-            FileOperations.writetofile(MainActivity.av, Utils.trim_end(bitsWithPadding),
-                    Utils.genName(Constants.SignalType.BitsFull_1000_2500_Padding, m_attempt) + ".txt");
-            FileOperations.writetofile(MainActivity.av, Utils.trim_end(bitsWithoutPadding),
-                    Utils.genName(Constants.SignalType.BitsFull_1000_2500, m_attempt) + ".txt");
-            FileOperations.writetofile(MainActivity.av, Utils.trim_end(numberOfDataBits),
-                    Utils.genName(Constants.SignalType.Bit_Fill_1000_2500, m_attempt) + ".txt");
-        }
-        else if (sigType.equals(Constants.SignalType.DataFull_1000_1500)) {
-            FileOperations.writetofile(MainActivity.av, Utils.trim_end(bitsWithPadding),
-                    Utils.genName(Constants.SignalType.BitsFull_1000_1500_Padding, m_attempt) + ".txt");
-            FileOperations.writetofile(MainActivity.av, Utils.trim_end(bitsWithoutPadding),
-                    Utils.genName(Constants.SignalType.BitsFull_1000_1500, m_attempt) + ".txt");
-            FileOperations.writetofile(MainActivity.av, Utils.trim_end(numberOfDataBits),
-                    Utils.genName(Constants.SignalType.Bit_Fill_1000_1500, m_attempt) + ".txt");
-        }
+        FileOperations.writetofile(MainActivity.av, Utils.trim_end(bitsWithPadding),
+                Utils.genName(Constants.SignalType.BitsAdapt_Padding, m_attempt) + ".txt");
+        FileOperations.writetofile(MainActivity.av, Utils.trim_end(bitsWithoutPadding),
+                Utils.genName(Constants.SignalType.BitsAdapt, m_attempt) + ".txt");
+        FileOperations.writetofile(MainActivity.av, Utils.trim_end(numberOfDataBits),
+                Utils.genName(Constants.SignalType.Bit_Fill_Adapt, m_attempt) + ".txt");
+
         return txsig;
     }
 
@@ -279,25 +225,7 @@ public class SymbolGeneration {
     }
 
     public static short[] getTrainingSymbol(int[] valid_carrier) {
-        short[] training_bits = null;
-        if (Constants.subcarrier_number_default==20) {
-            training_bits = Utils.segment(Constants.pn20_bits, 0, valid_carrier.length - 1);
-        }
-        else if (Constants.subcarrier_number_default==40) {
-            training_bits = Utils.segment(Constants.pn40_bits, 0, valid_carrier.length - 1);
-        }
-        else if (Constants.subcarrier_number_default==60) {
-            training_bits = Utils.segment(Constants.pn60_bits, 0, valid_carrier.length - 1);
-        }
-        else if (Constants.subcarrier_number_default==120) {
-            training_bits = Utils.segment(Constants.pn120_bits, 0, valid_carrier.length - 1);
-        }
-        else if (Constants.subcarrier_number_default==300) {
-            training_bits = Utils.segment(Constants.pn300_bits, 0, valid_carrier.length - 1);
-        }
-        else if (Constants.subcarrier_number_default==600) {
-            training_bits = Utils.segment(Constants.pn600_bits, 0, valid_carrier.length - 1);
-        }
+        short[] training_bits = Utils.segment(Constants.pn60_bits, 0, valid_carrier.length - 1);
         short[] symbol = generate_helper(
                 training_bits,
                 valid_carrier,
@@ -421,16 +349,6 @@ public class SymbolGeneration {
             }
         }
         return false;
-    }
-
-    public static short[] rand_bits(int n) {
-        Log.e(LOG, "SymbolGeneration_rand_bits");
-        Constants.resetRandom();
-        short[] arr = new short[n];
-        for (int i = 0; i < arr.length; i++) {
-            arr[i] = (short)Constants.random.nextInt(2);
-        }
-        return arr;
     }
 
     public static short[] getCodedBits() {

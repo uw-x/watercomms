@@ -1,14 +1,11 @@
 package com.example.root.ffttest2;
 
 import static com.example.root.ffttest2.Constants.LOG;
-import static com.example.root.ffttest2.Constants.xcorr_method;
 
 import android.app.Activity;
 import android.util.Log;
 
 import java.util.Arrays;
-import java.util.Collections;
-import java.util.LinkedList;
 
 public class ChannelEstimate {
     public static int xcorr_helper(double[] rec, Constants.SignalType sigType) {
@@ -17,7 +14,7 @@ public class ChannelEstimate {
         filt=Utils.filter(filt);
         Log.e(LOG, "finish filtering");
 
-        double[] tx_preamble = ChirpGen.preamble_d();
+        double[] tx_preamble = PreambleGen.preamble_d();
 
         int start_point = Utils.xcorr(tx_preamble, filt, rec, filt.length, sigType);
 //        if (start_point > Constants.butterworthFiltOffset) {
