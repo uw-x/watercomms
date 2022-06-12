@@ -6,4 +6,4 @@ https://user-images.githubusercontent.com/174899/173208820-45f29503-06ed-47e7-bb
 
 The repository contains :
 * [Smartphone code](smartphone/OceanRealDemo/) that can be used to run the messaging app in realtime like in the demo video.
-* [MATLAB code](Matlab_Decoder/) to process a sample dataset of underwater data and reproduce the main result of the paper
+* [MATLAB code](Matlab_Decoder/) to process a sample dataset of underwater data and reproduce results from different locations and distances.
