@@ -1,7 +1,5 @@
 package com.example.root.ffttest2;
 
-import static com.example.root.ffttest2.Constants.LOG;
-
 import android.app.Activity;
 import android.util.Log;
 
