@@ -1,6 +1,6 @@
 
 # Smartphone code
-The smartphone [code](smartphone/) is an Android Studio project of the real time demo application.
+The smartphone code is an Android Studio project of the real time demo application.
 
 The project was originally built with Android Studio Arctic Fox 2020.3.1 Patch 2, and has been tested on Samsung Galaxy S9 phones.
 
