@@ -18,7 +18,7 @@ We have documented areas of the code that correspond to key system components in
 | Protocol sequence logic      | [Code](smartphone/OceanRealDemo/app/src/main/java/com/example/root/ffttest2/SendChirpAsyncTask.java)       |
 | Preamble generation (Alice)     | [Code](smartphone/OceanRealDemo/app/src/main/java/com/example/root/ffttest2/SendChirpAsyncTask.java)       |
 | SNR estimation (Bob)     | [Code](smartphone/OceanRealDemo/app/src/main/java/com/example/root/ffttest2/SendChirpAsyncTask.java)       |
-| Frequency band selection (Bob)      | [Code](smartphone/OceanRealDemo/app/src/main/java/com/example/root/ffttest2/SendChirpAsyncTask.java)       |
+| Frequency band selection (Bob)      | [Code](smartphone/OceanRealDemo/app/src/main/java/com/example/root/ffttest2/Fre_adaptation.java#L13)       |
 | Encoding feedback (Bob)    | [Code](smartphone/OceanRealDemo/app/src/main/java/com/example/root/ffttest2/SendChirpAsyncTask.java)       |
 | Decoding feedback  (Alice)    | [Code](smartphone/OceanRealDemo/app/src/main/java/com/example/root/ffttest2/SendChirpAsyncTask.java)       |
 | Encoding data packet (Alice)     | [Code](smartphone/OceanRealDemo/app/src/main/java/com/example/root/ffttest2/SendChirpAsyncTask.java)       |
