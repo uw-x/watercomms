@@ -5,6 +5,7 @@ The smartphone code is an Android Studio project of the real time demo applicati
 The project was originally built with Android Studio Arctic Fox 2020.3.1 Patch 2, and has been tested on Samsung Galaxy S9 phones.
 
 Reproducing the demo video will require two Android smartphones. [Waterproof pouches](https://www.amazon.com/gp/product/B08S3SG5KF/ref=ppx_yo_dt_b_asin_title_o00_s00) would be needed to do testing underwater.
+When sending messages, please wait for about 5 seconds before sending the next message.
 
 ![uwater](https://user-images.githubusercontent.com/174899/173209389-514fea83-f589-4e97-b3b5-28c9b5a331e4.svg)
 
