@@ -1,5 +1,6 @@
 # Underwater Messaging Using Mobile Devices (SIGCOMM '22)
 
+Demo showing communication underwater and over the air:
 https://user-images.githubusercontent.com/174899/173208820-45f29503-06ed-47e7-bb95-b444bfa6cda5.mp4
 
 # Smartphone code
