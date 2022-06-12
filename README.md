@@ -9,7 +9,7 @@ The project was originally built with Android Studio Arctic Fox 2020.3.1 Patch 2
 
 Reproducing the demo video will require two Android smartphones, as well as [waterproof pouches](https://www.amazon.com/gp/product/B08S3SG5KF/ref=ppx_yo_dt_b_asin_title_o00_s00).
 
-We have documented key areas of the code that correspond to the system design in Section 2 of the paper.
+We have documented areas of the code that correspond to key system components in our paper:
 
 | System component      | Link to code |
 | ----------- | ----------- |
