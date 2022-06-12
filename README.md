@@ -1,6 +1,6 @@
 # Underwater Messaging Using Mobile Devices (SIGCOMM '22)
 
-https://user-images.githubusercontent.com/174899/173207985-e6e0b2f8-1f8c-4463-acc9-5f3bef490728.mp4
+https://user-images.githubusercontent.com/174899/173208820-45f29503-06ed-47e7-bb95-b444bfa6cda5.mp4
 
 # Smartphone code
 The smartphone [code](smartphone/) is an Android Studio project of the real time demo application.
@@ -11,21 +11,24 @@ Reproducing the demo video will require two Android smartphones, as well as [wat
 
 We have documented key areas of the code that correspond to the system design in Section 2 of the paper.
 
-<ul>
+| System component      | Link to code |
+| ----------- | ----------- |
+| Protocol sequence logic      | [Code](smartphone/OceanRealDemo/app/src/main/java/com/example/root/ffttest2/SendChirpAsyncTask.java)       |
+| Preamble generation (Alice)     | [Code](smartphone/OceanRealDemo/app/src/main/java/com/example/root/ffttest2/SendChirpAsyncTask.java)       |
+| SNR estimation (Bob)     | [Code](smartphone/OceanRealDemo/app/src/main/java/com/example/root/ffttest2/SendChirpAsyncTask.java)       |
+| Frequency band selection (Bob)      | [Code](smartphone/OceanRealDemo/app/src/main/java/com/example/root/ffttest2/SendChirpAsyncTask.java)       |
+| Encoding feedback (Bob)    | [Code](smartphone/OceanRealDemo/app/src/main/java/com/example/root/ffttest2/SendChirpAsyncTask.java)       |
+| Decoding feedback  (Alice)    | [Code](smartphone/OceanRealDemo/app/src/main/java/com/example/root/ffttest2/SendChirpAsyncTask.java)       |
+| Encoding data packet (Alice)     | [Code](smartphone/OceanRealDemo/app/src/main/java/com/example/root/ffttest2/SendChirpAsyncTask.java)       |
+| Decoding data packet (Bob)     | [Code](smartphone/OceanRealDemo/app/src/main/java/com/example/root/ffttest2/SendChirpAsyncTask.java)       |
+
 ![Screenshot from 2022-06-11 16-47-43](https://user-images.githubusercontent.com/174899/173208477-57eb4fb3-68ce-4651-afed-27ace099da47.png)
+
+***Protocol sequence logic***
 
 ![Screenshot from 2022-06-11 16-47-59](https://user-images.githubusercontent.com/174899/173208480-980fb88b-820c-416f-9521-7d0b5f1eb524.png)
 
-  <li>The logic for controlling the sequence of steps in our protocol is in SendChirpAsycTask:148</li>
-  <li>Preamble generation (Alice): </li>
-  <li>SNR estimation (Bob): xxx </li>
-  <li>Frequency band selection (Bob): xxx</li>
-  <li>Encoding feedback (Bob): xxx </li>
-  <li>Decoding feedback (Alice): xxx </li>
-  <li>Encoding data packet (Alice): xxx </li>
-  <li>Decoding data packet (Bob): xxx </li>
-</ul>
-
+***Encoding and decoding data packets***
 
 # MATLAB code
 - [matlab/](matlab/) 
