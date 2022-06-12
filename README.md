@@ -9,7 +9,7 @@ The project was originally built with Android Studio Arctic Fox 2020.3.1 Patch 2
 
 Reproducing the demo video will require two Android smartphones, as well as [waterproof pouches](https://www.amazon.com/gp/product/B08S3SG5KF/ref=ppx_yo_dt_b_asin_title_o00_s00).
 
-![uwater](https://user-images.githubusercontent.com/174899/173209246-7322f55d-ea3d-419e-abb4-1305da286c53.png)
+![uwater](https://user-images.githubusercontent.com/174899/173209389-514fea83-f589-4e97-b3b5-28c9b5a331e4.svg)
 
 We have documented areas of the code that correspond to key system components in our paper:
 
@@ -17,7 +17,7 @@ We have documented areas of the code that correspond to key system components in
 | ----------- | ----------- |
 | Protocol sequence logic      | [Code](smartphone/OceanRealDemo/app/src/main/java/com/example/root/ffttest2/SendChirpAsyncTask.java)       |
 | Preamble generation (Alice)     | [Code](smartphone/OceanRealDemo/app/src/main/java/com/example/root/ffttest2/SendChirpAsyncTask.java)       |
-| SNR estimation (Bob)     | [Code](smartphone/OceanRealDemo/app/src/main/java/com/example/root/ffttest2/SendChirpAsyncTask.java)       |
+| SNR estimation (Bob)     | [Code](smartphone/OceanRealDemo/app/src/main/java/com/example/root/ffttest2/SNR_freq.java#L4)       |
 | Frequency band selection (Bob)      | [Code](smartphone/OceanRealDemo/app/src/main/java/com/example/root/ffttest2/Fre_adaptation.java#L13)       |
 | Encoding feedback (Bob)    | [Code](smartphone/OceanRealDemo/app/src/main/java/com/example/root/ffttest2/SendChirpAsyncTask.java)       |
 | Decoding feedback  (Alice)    | [Code](smartphone/OceanRealDemo/app/src/main/java/com/example/root/ffttest2/SendChirpAsyncTask.java)       |
