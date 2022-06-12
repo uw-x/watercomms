@@ -71,7 +71,7 @@ public class FeedbackSignal {
         return out;
     }
 
-    public static short[] multi_freq_signal(int fbegin, int fend, int len_ms, boolean preamble, int m_attempt) {
+    public static short[] encodeFeedbackSignal(int fbegin, int fend, int len_ms, boolean preamble, int m_attempt) {
         int len = (int)((len_ms/1000.0)*Constants.fs);
         if (preamble) {
             len += ((Constants.preambleTime/1000.0)*Constants.fs)+Constants.ChirpGap;
@@ -92,6 +92,7 @@ public class FeedbackSignal {
         fbegin=Math.round(fbegin/10)*10;
         fend=Math.round(fend/10)*10;
 
+        // encode the feedback frequencies
         int freqs[] = new int[]{fbegin,fend};
         int fbackLen=(int)((Constants.fbackTime/1000.0)*Constants.fs);
         for (int freq = 0; freq < freqs.length; freq++) {
@@ -129,20 +130,15 @@ public class FeedbackSignal {
 
     public static int[] parse_signal(double[] preamble, double[] feedback) {
         Log.e(LOG,"FeedbackSignal_parse_signal");
-//        int freq_spacing = Constants.fs/feedback.length;
 
         double[] preamble_spec = Utils.fftnative_double(preamble, preamble.length);
 
-        long t1 = System.currentTimeMillis();
         double[] feedback_spec = Utils.fftnative_double(feedback, feedback.length);
-//        double[] noise_spec = Utils.fftnative_double(noise, noise.length);
 
         double[] preamble_spec_db = Utils.mag2db(preamble_spec);
         double[] feedback_spec_db = Utils.mag2db(feedback_spec);
-//        double[] noise_db = Utils.mag2db(noise_spec);
 
-        int[] freqs= getFreqs(feedback_spec_db);
-        Log.e("time","runtime2 "+(System.currentTimeMillis()-t1)+"");
+        int[] freqs= decodeFeedbackSignal(feedback_spec_db);
 
         if (freqs.length==2) {
             Utils.log("feedback freqs " + freqs[0] + "," + freqs[freqs.length - 1]);
@@ -159,7 +155,6 @@ public class FeedbackSignal {
                 Constants.gview2.setTitle("");
                 Constants.gview3.setTitle("");
                 Display.plotSpectrum(Constants.gview, preamble_spec_db, true, MainActivity.av.getResources().getColor(R.color.purple_500),"");
-//                Display.plotSpectrum(Constants.gview, noise_db, false, MainActivity.av.getResources().getColor(R.color.black),"Rx preamble");
 
                 Display.plotVerticalLine(Constants.gview, Constants.f_seq.get(Constants.nbin1_chanest));
                 Display.plotVerticalLine(Constants.gview, Constants.f_seq.get(Constants.nbin2_chanest));
@@ -181,8 +176,7 @@ public class FeedbackSignal {
         return freqs;
     }
 
-    // top 2 bins by snr
-    public static int[] getFreqs(double[] feedback_spec_db) {
+    public static int[] decodeFeedbackSignal(double[] feedback_spec_db) {
 
         LinkedList<Bin> bins = new LinkedList<>();
         double[] smooth_sig = feedback_spec_db;

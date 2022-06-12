@@ -22,25 +22,14 @@ public class AudioSpeaker extends Thread {
             AudioManager.STREAM_RING, AudioManager.STREAM_SYSTEM,
             AudioManager.STREAM_VOICE_CALL};
 
-    /**
-     * Setup an Android.Media.AudioTrack() with data and parameters.
-     * This AudioTrack() object is later played out of the speaker.
-     * @param mycontext The caller's context.
-     * @param samples The data that will be played by the speaker.
-     * @param samplingFreq The initial source sample rate expressed in Hz.
-     * @TODO upgrade deprecated calls.
-     */
     int preamble_length;
     public AudioSpeaker(Context mycontext, short[] samples, int samplingFreq, int loops, int preamble_length, boolean top) {
         this.loops = loops;
         this.preamble_length=preamble_length;
         this.samplingFreq= samplingFreq;
-//        if (top) {
-//            this.speakerType = AudioManager.STREAM_VOICE_CALL;
-//        }
-//        else {
+
         this.speakerType = AudioManager.STREAM_SYSTEM; // streamType – the type of the audio stream
-//        }
+
         this.mycontext = mycontext;
         man = (AudioManager)mycontext.getSystemService(Context.AUDIO_SERVICE);
         for (Integer i : streams) {
@@ -84,8 +73,6 @@ public class AudioSpeaker extends Thread {
 
     public void run() {
         Log.e("asdf","set loop points ");
-//        track1.setLoopPoints(0, samples.length, -1);
-//        track1.play();
     }
 
     public void pause() {

@@ -8,16 +8,16 @@ import java.util.Arrays;
 import java.util.Random;
 
 public class SymbolGeneration {
-    public static short[] generate(short[] bits, int[] valid_carrier,
-                                   int symreps, boolean preamble, Constants.SignalType sigType) {
-        int numrounds = 0;
+    public static short[] generatePreamble(short[] bits, int[] valid_carrier,
+                                           int symreps, boolean preamble, Constants.SignalType sigType) {
+        int numDataSyms = 0;
         if (valid_carrier.length > 0) {
-            numrounds = (int) Math.ceil((double)bits.length/valid_carrier.length);
+            numDataSyms = (int) Math.ceil((double)bits.length/valid_carrier.length);
         }
 
         int symlen = (Constants.Ns+Constants.Cp)*symreps + Constants.Gi;
 
-        int siglen = symlen*numrounds;
+        int siglen = symlen*numDataSyms;
         if (preamble) {
             siglen += ((Constants.preambleTime/1000.0)*Constants.fs)+Constants.ChirpGap;
         }
@@ -33,18 +33,21 @@ public class SymbolGeneration {
             counter += Constants.ChirpGap;
         }
 
-        short[][] bit_list = new short[numrounds][valid_carrier.length];
+        short[][] bit_list = new short[numDataSyms][valid_carrier.length];
         int bit_counter = 0;
-        for (int i = 0; i < numrounds; i++) {
+        for (int i = 0; i < numDataSyms; i++) {
             int endpoint = bit_counter + valid_carrier.length-1;
             if (bit_counter + valid_carrier.length-1 > bits.length-1) {
                 endpoint = bits.length-1;
             }
+            // segment data bits to add to symbol
             short[] bits_seg = Utils.segment(bits,bit_counter,endpoint);
             if (i > 0) {
+                // differential encoding
                 bits_seg = transform_bits(bit_list[i-1], bits_seg);
             }
             bit_list[i] = bits_seg;
+            // modulate bits into OFDM symbol
             short[] symbol = generate_helper(
                     bits_seg,
                     valid_carrier,
@@ -96,9 +99,9 @@ public class SymbolGeneration {
         return out;
     }
 
-    public static short[] generate2(short[] bits, int[] valid_carrier,
-                                   int symreps, boolean preamble, Constants.SignalType sigType,
-                                    int m_attempt) {
+    public static short[] generateDataSymbols(short[] bits, int[] valid_carrier,
+                                              int symreps, boolean preamble, Constants.SignalType sigType,
+                                              int m_attempt) {
         int numrounds = 0;
         if (valid_carrier.length > 0) {
             numrounds = (int) Math.ceil((double)bits.length/valid_carrier.length);

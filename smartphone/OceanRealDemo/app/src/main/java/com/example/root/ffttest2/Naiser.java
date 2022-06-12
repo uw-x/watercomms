@@ -1,40 +1,8 @@
 package com.example.root.ffttest2;
 
-import android.util.Log;
-
 public class Naiser {
 
-    public static double[] Naiser_corr(double[] signal, int Nu, int DIVIDE_FACTOR) {
-        short[] PN_seq = new short[] {1, -1, -1, -1, -1, -1, 1, -1};
-        int total_length = signal.length;
-        int L = 8;
-        int preamble_L = L * Nu;
-        int multi_num = 0;
-        int len_corr = (total_length - preamble_L)/DIVIDE_FACTOR + 2;
-        double[] naiser_corr = new double[len_corr];
-        int num = 0;
-        for(int  i = 0; i < total_length - preamble_L -1; i = i+DIVIDE_FACTOR){
-            double[] seg = Utils.segment(signal, i, i+preamble_L - 1);
-            double Pd = 0;
-            for(int k = 0; k < L - 1; ++k){
-                multi_num ++;
-                int bk = PN_seq[k]*PN_seq[k+1];
-                double[] seg1 = Utils.segment(seg, k*Nu, (k+1)*Nu - 1);
-                double[] seg2 = Utils.segment(seg, (k + 1)*Nu, (k+2)*Nu - 1);
-                Pd += bk*Utils.sum_multiple(seg1, seg2);
-
-            }
-            double Rd = Utils.sum_multiple(seg, seg);
-            naiser_corr[num] = Pd/Rd;
-            num ++;
-        }
-        double[] max_info = Utils.max(naiser_corr);
-        max_info[1] = max_info[1] *DIVIDE_FACTOR;
-//        Log.e("multiple times",Integer.toString(multi_num));
-        return  max_info;
-    }
-
-    public static double[] Naiser_corr2(double[] signal, int Nu, int N0, int DIVIDE_FACTOR) {
+    public static double[] Naiser_corr(double[] signal, int Nu, int N0, int DIVIDE_FACTOR) {
         short[] PN_seq = new short[] {1, -1, -1, -1, -1, -1, 1, -1};
         int total_length = signal.length;
         int L = 8;
@@ -65,7 +33,6 @@ public class Naiser {
                     Rd = Rd + Utils.sum_multiple(seg2, seg2);
                 }
             }
-            //double Rd = Utils.sum_multiple(seg, seg);
             naiser_corr[num] = Pd/Rd/(L-1)*L;
             num ++;
         }
@@ -96,7 +63,6 @@ public class Naiser {
             }
         }
 
-//        Utils.log("max info: "+((left+right)/2)+","+max_info[1]);
         if(right == -1 || left == -1){
             max_info[1] = max_info[1] *DIVIDE_FACTOR;
             return max_info;
@@ -105,8 +71,6 @@ public class Naiser {
             max_info[1] = (right + left)/2.0 *DIVIDE_FACTOR;
             return  max_info;
         }
-//        Log.e("multiple times",Integer.toString(multi_num));
-
     }
 
     public static double[] Naiser_check_valid(double[] signal, int peak_index) {
@@ -114,24 +78,15 @@ public class Naiser {
         double naiser_threshold = Constants.NaiserThresh; //adjustable
         int step_size = 8;
 
-//        if(peak_index - win_size < 0 || peak_index + win_size + 9600 > signal.length) return new double[]{-2,-2};
-//        double[] preamble_seg = Utils.segment(signal, peak_index - win_size, peak_index + win_size + 9600 -1);
-
         if(peak_index - win_size < 0 || peak_index + win_size + Constants.naiser.length > signal.length) return new double[]{-2,-2};
         double[] preamble_seg = Utils.segment(signal, peak_index - win_size, peak_index + win_size + Constants.naiser.length -1);
 
         double[] max_info=null;
-//        if (Constants.naiserVersion==1) {
-//            max_info = Naiser_corr(preamble_seg, 960,  step_size);
-//        }
-//        else if (Constants.naiserVersion==2) {
-            max_info = Naiser_corr2(preamble_seg, 960, 240, step_size);
-//        }
-        Log.e("naiser","max info "+max_info[0]);
+        max_info = Naiser_corr(preamble_seg, 960, 240, step_size);
+
         if(max_info[0] < naiser_threshold) return new double[]{-1,max_info[0]};
         else{
             return new double[]{peak_index - win_size + max_info[1],max_info[0]};
         }
     }
-
 }

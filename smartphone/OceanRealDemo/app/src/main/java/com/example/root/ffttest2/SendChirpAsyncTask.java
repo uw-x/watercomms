@@ -205,7 +205,7 @@ public class SendChirpAsyncTask extends AsyncTask<Void, Void, Void> {
                 }
             } while (valid_bins == null || valid_bins.length == 0 || valid_bins[0] == -1);
 
-            short[] feedback = FeedbackSignal.multi_freq_signal(valid_bins[0], valid_bins[valid_bins.length - 1],
+            short[] feedback = FeedbackSignal.encodeFeedbackSignal(valid_bins[0], valid_bins[valid_bins.length - 1],
                     Constants.fbackTime, true, m_attempt);
 
             Constants.sp1 = new AudioSpeaker(av, feedback, Constants.fs, 0, feedback.length, false);
@@ -228,52 +228,22 @@ public class SendChirpAsyncTask extends AsyncTask<Void, Void, Void> {
     }
 
     public static void sendData(int[] valid_bins, int m_attempt) {
-        if (Constants.exp_num == 1||Constants.exp_num == 2) {
-            send_data_ber(valid_bins,m_attempt);
-        } else if (Constants.exp_num == 3||Constants.exp_num == 4) {
-            send_data_per(valid_bins,m_attempt);
-        } else if (Constants.exp_num == 5) {
-            send_data_per(valid_bins,m_attempt);
-        }
+        send_data_per(valid_bins,m_attempt);
     }
 
     public static void send_data_helper(int numbits, int[] valid_bins, int m_attempt,
                                  Constants.SignalType sigType,Constants.ExpType expType) {
         short[] bits = SymbolGeneration.getCodedBits();
-        Log.e("numbits",bits.length+"");
+
         String out="";
         for (int i = 0; i < bits.length; i++) {
             out+=bits[i]+"";
         }
-        Log.e("coder",out);
-        Log.e("coder",Integer.toBinaryString(Constants.messageID));
-        Log.e("coder",Constants.messageID+"");
-        Log.e("coder",Constants.codeRate.toString());
-        short[] txsig = null;
-        if (expType.equals(Constants.ExpType.BER)) {
-            txsig=SymbolGeneration.generate2(bits, valid_bins, Constants.data_symreps,
-                    true, sigType, m_attempt);
-        }
-        else if (expType.equals(Constants.ExpType.PER)) {
-            txsig=SymbolGeneration.generate2(bits, valid_bins, Constants.data_symreps, true,
-                    sigType,m_attempt);
-        }
-        if (sigType.equals(Constants.SignalType.DataAdapt)) {
-            FileOperations.writetofile(MainActivity.av, txsig,
-                    Utils.genName(Constants.SignalType.DataAdapt, m_attempt) + ".txt");
-        }
-        else if (sigType.equals(Constants.SignalType.DataFull_1000_4000)) {
-            FileOperations.writetofile(MainActivity.av, txsig,
-                    Utils.genName(Constants.SignalType.DataFull_1000_4000, m_attempt) + ".txt");
-        }
-        else if (sigType.equals(Constants.SignalType.DataFull_1000_2500)) {
-            FileOperations.writetofile(MainActivity.av, txsig,
-                    Utils.genName(Constants.SignalType.DataFull_1000_2500, m_attempt) + ".txt");
-        }
-        else if (sigType.equals(Constants.SignalType.DataFull_1000_1500)) {
-            FileOperations.writetofile(MainActivity.av, txsig,
-                    Utils.genName(Constants.SignalType.DataFull_1000_1500, m_attempt) + ".txt");
-        }
+
+        short[] txsig=SymbolGeneration.generateDataSymbols(bits, valid_bins, Constants.data_symreps, true, sigType,m_attempt);
+
+        FileOperations.writetofile(MainActivity.av, txsig,
+                Utils.genName(Constants.SignalType.DataAdapt, m_attempt) + ".txt");
 
         Constants.sp1 = new AudioSpeaker(MainActivity.av, txsig, Constants.fs, 0, txsig.length, false);
         Constants.sp1.play(Constants.volume);
