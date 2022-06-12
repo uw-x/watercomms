@@ -166,7 +166,7 @@ public class SendChirpAsyncTask extends AsyncTask<Void, Void, Void> {
             } while (feedback_signal == null);
 
             double[] seg = Utils.segment(feedback_signal,0,24000-1);
-            double[] xcorr_out = Utils.xcorr_online(tx_preamble, seg, seg, Constants.SignalType.Feedback);
+            double[] xcorr_out = Utils.xcorr_online(tx_preamble, seg);
 
             int[] valid_bins = FeedbackSignal.extractSignalHelper(feedback_signal, (int)xcorr_out[1], m_attempt);
 
@@ -195,7 +195,7 @@ public class SendChirpAsyncTask extends AsyncTask<Void, Void, Void> {
                 }
 
                 double[] seg = Utils.segment(sounding_signal,0,24000-1);
-                double[] xcorr_out = Utils.xcorr_online(tx_preamble, seg, seg, Constants.SignalType.Sounding);
+                double[] xcorr_out = Utils.xcorr_online(tx_preamble, seg);
 
                 valid_bins = ChannelEstimate.extractSignal_withsymbol_helper(av, sounding_signal, (int)xcorr_out[1], m_attempt);
                 chirpLoopNumber++;

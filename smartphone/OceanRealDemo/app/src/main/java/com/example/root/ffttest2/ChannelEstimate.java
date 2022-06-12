@@ -8,36 +8,7 @@ import android.util.Log;
 import java.util.Arrays;
 
 public class ChannelEstimate {
-    public static int xcorr_helper(double[] rec, Constants.SignalType sigType) {
-        double[] filt = Utils.copyArray(rec);
-
-        filt=Utils.filter(filt);
-        Log.e(LOG, "finish filtering");
-
-        double[] tx_preamble = PreambleGen.preamble_d();
-
-        int start_point = Utils.xcorr(tx_preamble, filt, rec, filt.length, sigType);
-//        if (start_point > Constants.butterworthFiltOffset) {
-//            start_point -= Constants.butterworthFiltOffset;
-//        }
-        if (start_point-Constants.besselFiltOffset >= 0) {
-            start_point -= Constants.besselFiltOffset;
-        }
-        return start_point;
-    }
-
-    public static int[] extractSignal_withsymbol(Activity av, double[] rec, int m_attempt, Constants.SignalType sigType) {
-        Log.e(LOG, "ChannelEstimate_extractSignal " + rec.length);
-        int start_point = xcorr_helper(rec, sigType);
-        Log.e("start",""+start_point);
-        return extractSignal_withsymbol_helper(av, rec, start_point, m_attempt);
-    }
-
     public static int[] extractSignal_withsymbol_helper(Activity av, double[] rec, int start_point, int m_attempt) {
-        long t1 = System.currentTimeMillis();
-
-        Log.e(LOG, "xcorr " + start_point + ":" + (System.currentTimeMillis() - t1) + ":" + rec.length);
-
         int rx_preamble_start = start_point;
         rx_preamble_start+=240;
 
@@ -47,73 +18,21 @@ public class ChannelEstimate {
             Utils.log("Error extracting preamble from sounding signal " + rx_preamble_start + "," + rx_preamble_end);
             return new int[]{};
         }
-        double[] rx_preamble = Utils.segment(rec, rx_preamble_start, rx_preamble_end);
-        double[] rx_preamble_db = Utils.mag2db(Utils.fftnative_double(rx_preamble, rx_preamble.length));
 
         ////////////////////////////////////////////////////////////////////////////////////
 
         int rx_sym_start = rx_preamble_end + Constants.ChirpGap + 1;
         int rx_sym_end = rx_sym_start + ((Constants.Ns + Constants.Cp)* Constants.chanest_symreps) - 1;
-        int rx_sym_len = (rx_sym_end - rx_sym_start) + 1;
 
         if (rx_sym_end - 1 > rec.length || rx_sym_start < 0) {
             Utils.log("Error extracting preamble from sounding signal");
             return new int[]{};
         }
-        Log.e(LOG, "sym " + rec.length + "," + rx_sym_start + "," + rx_sym_end + "," + rx_sym_len);
+
         double[] rx_symbols = Utils.segment(rec, rx_sym_start, rx_sym_end);
         rx_symbols = Utils.div(rx_symbols,30000);
 
-        double[] finalRx_symbols = rx_symbols;
-        av.runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                Display.plotSpectrum(Constants.gview, rx_preamble_db, true,
-                        MainActivity.av.getResources().getColor(R.color.purple_500),
-                        "Rx preamble");
-                Display.plotVerticalLine(Constants.gview, Constants.f_seq.get(Constants.nbin1_default));
-                Display.plotVerticalLine(Constants.gview, Constants.f_seq.get(Constants.nbin2_default));
-
-                int cc=Constants.Cp;
-                for (int i = 0; i < Constants.chanest_symreps; i++) {
-                    double[] seg = Utils.segment(finalRx_symbols, cc, cc + Constants.Ns - 1);
-                    double[] spec = Utils.mag2db(Utils.fftnative_double(seg,seg.length));
-                    if (i==0) {
-                        Display.plotSpectrum(Constants.gview2, spec, true,
-                                MainActivity.av.getResources().getColor(R.color.red), "Symbol");
-                    }
-                    else if (i==1) {
-                        Display.plotSpectrum(Constants.gview2, spec, false,
-                                MainActivity.av.getResources().getColor(R.color.orange), "Symbol");
-                    }
-                    else if (i==2) {
-                        Display.plotSpectrum(Constants.gview2, spec, false,
-                                MainActivity.av.getResources().getColor(R.color.yellow), "Symbol");
-                    }
-                    else if (i==3) {
-                        Display.plotSpectrum(Constants.gview2, spec, false,
-                                MainActivity.av.getResources().getColor(R.color.green), "Symbol");
-                    }
-                    else if (i==4) {
-                        Display.plotSpectrum(Constants.gview2, spec, false,
-                                MainActivity.av.getResources().getColor(R.color.blue), "Symbol");
-                    }
-                    else if (i==5) {
-                        Display.plotSpectrum(Constants.gview2, spec, false,
-                                MainActivity.av.getResources().getColor(R.color.purple), "Symbol");
-                    }
-                    else if (i==6) {
-                        Display.plotSpectrum(Constants.gview2, spec, false,
-                                MainActivity.av.getResources().getColor(R.color.black), "Symbol");
-                    }
-                    else {
-                        Display.plotSpectrum(Constants.gview2, spec, false,
-                                MainActivity.av.getResources().getColor(R.color.purple_500), "Symbol");
-                    }
-                    cc+=Constants.Ns+Constants.Cp;
-                }
-            }
-        });
+        plotRxSyms(av, rx_symbols);
 
         int freqSpacing = Constants.fs/Constants.Ns;
         int[] fseq = Utils.linspace(Constants.f_range[0],freqSpacing,Constants.f_range[1]);
@@ -124,6 +43,7 @@ public class ChannelEstimate {
         int cc=Constants.Cp;
         double [][][] spec_est = new double[2][Constants.subcarrier_number_default][Constants.chanest_symreps];
         for (int i = 0; i < Constants.chanest_symreps; i++) {
+            Log.e("asdf","fft");
             double[] seg = Utils.segment(rx_symbols,cc,cc+Constants.Ns-1);
             double[][] spec = Utils.fftcomplexoutnative_double(seg,seg.length);
 
@@ -137,24 +57,7 @@ public class ChannelEstimate {
             cc+=Constants.Ns+Constants.Cp;
         }
 
-        if (Constants.subcarrier_number_default == 20) {
-            snrs = SNR_freq.calculate_snr(spec_est, Constants.pn20_syms, 1, Constants.chanest_symreps);
-        }
-        else if (Constants.subcarrier_number_default == 40) {
-            snrs = SNR_freq.calculate_snr(spec_est, Constants.pn40_syms, 1, Constants.chanest_symreps);
-        }
-        else if (Constants.subcarrier_number_default == 60) {
-            snrs = SNR_freq.calculate_snr(spec_est, Constants.pn60_syms, 1, Constants.chanest_symreps);
-        }
-        else if (Constants.subcarrier_number_default == 120) {
-            snrs = SNR_freq.calculate_snr(spec_est, Constants.pn120_syms, 1, Constants.chanest_symreps);
-        }
-        else if (Constants.subcarrier_number_default == 300) {
-            snrs = SNR_freq.calculate_snr(spec_est, Constants.pn300_syms, 1, Constants.chanest_symreps);
-        }
-        else if (Constants.subcarrier_number_default == 600) {
-            snrs = SNR_freq.calculate_snr(spec_est, Constants.pn600_syms, 1, Constants.chanest_symreps);
-        }
+        snrs = SNR_freq.calculate_snr(spec_est, Constants.pn60_syms, 1, Constants.chanest_symreps);
 
         thresh=Constants.SNR_THRESH2;
 
@@ -186,5 +89,52 @@ public class ChannelEstimate {
                 Utils.genName(Constants.SignalType.FreqEsts, m_attempt) + ".txt");
 
         return selected;
+    }
+
+    public static void plotRxSyms(Activity av, double[] rx_symbols) {
+        double[] finalRx_symbols = rx_symbols;
+        av.runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                int cc=Constants.Cp;
+                for (int i = 0; i < Constants.chanest_symreps; i++) {
+                    double[] seg = Utils.segment(finalRx_symbols, cc, cc + Constants.Ns - 1);
+                    double[] spec = Utils.mag2db(Utils.fftnative_double(seg,seg.length));
+                    if (i==0) {
+                        Display.plotSpectrum(Constants.gview2, spec, true,
+                                MainActivity.av.getResources().getColor(R.color.red), "");
+                    }
+                    else if (i==1) {
+                        Display.plotSpectrum(Constants.gview2, spec, false,
+                                MainActivity.av.getResources().getColor(R.color.orange), "");
+                    }
+                    else if (i==2) {
+                        Display.plotSpectrum(Constants.gview2, spec, false,
+                                MainActivity.av.getResources().getColor(R.color.yellow), "");
+                    }
+                    else if (i==3) {
+                        Display.plotSpectrum(Constants.gview2, spec, false,
+                                MainActivity.av.getResources().getColor(R.color.green), "");
+                    }
+                    else if (i==4) {
+                        Display.plotSpectrum(Constants.gview2, spec, false,
+                                MainActivity.av.getResources().getColor(R.color.blue), "");
+                    }
+                    else if (i==5) {
+                        Display.plotSpectrum(Constants.gview2, spec, false,
+                                MainActivity.av.getResources().getColor(R.color.purple), "");
+                    }
+                    else if (i==6) {
+                        Display.plotSpectrum(Constants.gview2, spec, false,
+                                MainActivity.av.getResources().getColor(R.color.black), "");
+                    }
+                    else {
+                        Display.plotSpectrum(Constants.gview2, spec, false,
+                                MainActivity.av.getResources().getColor(R.color.purple_500), "Symbol");
+                    }
+                    cc+=Constants.Ns+Constants.Cp;
+                }
+            }
+        });
     }
 }

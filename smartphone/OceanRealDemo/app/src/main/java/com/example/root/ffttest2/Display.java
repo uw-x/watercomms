@@ -73,18 +73,12 @@ public class Display {
         gview.addSeries(series);
         gview.getViewport().setMinY(currentMin);
         gview.getViewport().setMaxY(currentMax);
-//        graph.getViewport().setBackgroundColor(context.getResources().getColor(R.color.colorWhite));
         gview.getViewport().setYAxisBoundsManual(true);
         gview.getViewport().setXAxisBoundsManual(true);
         gview.getViewport().setMinX(500);
         gview.getViewport().setMaxX(Constants.f_seq.get(Constants.nbin2_default)+1000);
-//        Constants.gview.getGridLabelRenderer().setHorizontalLabelsVisible(false);
-//        gview.getGridLabelRenderer().setVerticalLabelsVisible(false);
         GridLabelRenderer r = gview.getGridLabelRenderer();
         gview.setTitle(title);
-//        r.setVerticalLabelsVisible(false);
-//        r.setGridColor(context.getResources().getColor(R.color.colorDarkPink));
-//        r.setHorizontalLabelsVisible(false);
     }
 
     public static void plotValidBins(GraphView gview, int[] valid_bins, boolean clear) {

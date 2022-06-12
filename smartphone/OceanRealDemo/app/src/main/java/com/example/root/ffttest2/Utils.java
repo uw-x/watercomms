@@ -579,22 +579,9 @@ public class Utils {
         return maxidx;
     }
 
-    public static double[] xcorr_online(double[] preamble, double[] filt, double[] sig, Constants.SignalType sigType) {
-        long t1 = System.currentTimeMillis();
-//        Log.e("fifo","filt length "+filt.length+"");
+    public static double[] xcorr_online(double[] preamble, double[] filt) {
         double[] corr = xcorr_helper(preamble,filt);
-//        Log.e("timer2","a "+(System.currentTimeMillis()-t1)+"");
-
-        if (Constants.XcorrVersion==1) {
-            return evalSegv1(filt, corr, 0, preamble);
-        }
-        else if (Constants.XcorrVersion==2){
-//            t1 = System.currentTimeMillis();
-            double[] out = evalSegv2(sig, filt, corr, preamble, sigType);
-//            Log.e("timer2","b "+(System.currentTimeMillis()-t1)+"");
-            return out;
-        }
-        return new double[]{-1,-1,-1};
+        return evalSegv2(filt, corr);
     }
 
     public static double[] calculateSNR_null(double[] spec_symbol) {
@@ -651,7 +638,7 @@ public class Utils {
             if (end_idx <= sig.length - 1) {
                 double[] cand_sig = Utils.segment(sig, start_idx, end_idx);
                 double[] spec = Utils.mag2db(Utils.fftnative_double(cand_sig, cand_sig.length));
-                int[] freqs = FeedbackSignal.getFreqs(cand_sig, spec);
+                int[] freqs = FeedbackSignal.getFreqs(spec);
                 Log.e("cands_fre", freqs[0] + "," + freqs[1]);
 
                 FileOperations.appendtofile(MainActivity.av, freqs[0]+","+freqs[1]+"\n",
@@ -666,10 +653,9 @@ public class Utils {
         return false;
     }
 
-    public static double[] evalSegv2(double[] sig, double[] filt, double[] corr,double[] preamble,
-                                     Constants.SignalType sigType) {
+    public static double[] evalSegv2(double[] filt, double[] corr) {
         int[] cands=Utils.getCandidateLocs(corr);
-//        Log.e("cands","cands "+cands.length);
+
         double max=0;
         int maxidx=0;
         for (int j = 0; j < cands.length; j++) {
@@ -679,12 +665,8 @@ public class Utils {
                 max=legit2[1];
                 maxidx = idx;
             }
-//            Log.e("cands_stat",cands[j]+","+idx+","+legit2+","+sigType);
             if (legit2[0] > 0) {
-                boolean legit = Utils.isLegit(sig,sigType,preamble,idx);
-//                if (legit || !Constants.CHECK_SYM) {
                 return new double[]{corr[cands[j]], idx, legit2[1]};
-//                }
             }
         }
         return new double[]{-1,maxidx,max};
@@ -863,7 +845,7 @@ public class Utils {
                         filt = Utils.filter(filt);
 
                         //value,idx
-                        double[] xcorr_out = Utils.xcorr_online(tx_preamble, filt, out, sigType);
+                        double[] xcorr_out = Utils.xcorr_online(tx_preamble, filt);
 
                         long t1 = System.currentTimeMillis();
                         Utils.log(String.format("Listening... (%.2f)",xcorr_out[2]));
@@ -954,31 +936,16 @@ public class Utils {
                 Log.e("","");
             }
             else {
-                double[] status = evalSegv2(sig, filt, corr, preamble, sigType);
+                double[] status = evalSegv2(filt, corr);
                 Log.e(">>",status[0]+","+status[1]);
                 if (status[0] != -1) {
                     maxidx = xcorr_idx + counter;
                 }
             }
             counter=counter+moveamount;
-//            Log.e(LOG, ">>"+counter+","+seglen+","+seg.length+","+(counter+xcorr_idx)+","+corr[max_idx]+","+max_idx);
         }
-//        Log.e(LOG, ">>"+maxidx);
+
         return maxidx;
-    }
-
-    public static short[] pad(String str) {
-        int padlen=Constants.maxbits-str.length();
-        short[] out = new short[Constants.maxbits];
-        int counter=0;
-        for (int i = 0; i < padlen; i++) {
-            out[counter++]=0;
-        }
-
-        for (int i = 0; i < str.length(); i++) {
-            out[counter++]=Short.parseShort(""+str.charAt(i));
-        }
-        return out;
     }
 
     public static int[] getCandidateLocs(double[] corr) {
@@ -998,24 +965,12 @@ public class Utils {
     }
 
     public static double[] xcorr_helper(double[] preamble, double[] sig) {
-//        Log.e(LOG, "Utils_xcorr " + preamble.length + "," + sig.length);
         double[][] a = Utils.fftcomplexoutnative_double(preamble, sig.length);
         double[][] b = Utils.fftcomplexoutnative_double(sig, sig.length);
         Utils.conjnative(b);
         double[][] multout = Utils.timesnative(a, b);
         double[] corr = Utils.ifftnative(multout);
         return corr;
-//        Log.e(LOG, "Utils_xcorr " + preamble.length + "," + sig.length);
-//        double[][] a = Utils.fftcomplexoutnative_double(sig, sig.length);
-////        double[][] b = Utils.fftcomplexoutnative_double(preamble, sig.length);
-////        Utils.conjnative(preamble_spec);
-//        double[][] multout = Utils.timesnative(a, preamble_spec);
-//        double[] corr = Utils.ifftnative(multout);
-//        return corr;
-    }
-
-    public static int round(double i, int v){
-        return (int)(Math.ceil(i/v) * v);
     }
 
     public static double[] max_idx(double[] corr) {
@@ -1032,7 +987,6 @@ public class Utils {
 
     public static int transform_idx(int maxidx, int sig_len) {
         return sig_len-(maxidx*2)-1;
-//        return (maxidx*2)-2;
     }
 
     public static double[] abs(double[][] data) {
@@ -1042,44 +996,12 @@ public class Utils {
         }
         return out;
     }
-    public static double[] multiple(double[] x, double[] y) {
-        double[] out = new double[x.length];
-        for (int i = 0; i < x.length; i++) {
-            out[i]=x[i]*y[i];
-        }
-        return out;
-    }
-    public static double[][] multiple(double[] x, double[][] y) {
-        double[][] out = new double[2][x.length];
-        for (int i = 0; i < x.length; i++) {
-            out[0][i]=x[i]*y[0][i];
-            out[1][i]=x[i]*y[1][i];
-        }
-        return out;
-    }
-
     public static double[] filter(double[] sig) {
-//        Bessel butterworth1 = new Bessel();
-//
-//        Constants.f_range[0] = 1000;
-//        Constants.f_range[1] = 4000;
-//        int bw = (Constants.f_range[1]-Constants.f_range[0]);
-//        int cf = Constants.f_range[0]+(bw/2);
-//        butterworth1.bandPass(6,Constants.fs,cf,bw/2);
-//
-//        double[] out = new double[sig.length];
-//        for (int i = 0; i < sig.length; i++) {
-//            out[i]=butterworth1.filter(sig[i]);
-//        }
-//        return out;
-//        return bandpass(sig);
         return firwrapper(sig);
-//        return sig;
     }
 
     public static double[] firwrapper(double[] sig) {
         double[] h=new double[]{0.000182981959336989,0.000281596242979397,0.000278146045925432,0.000175593510303356,-4.62343304809110e-19,-0.000200360419689133,-0.000360951066953434,-0.000412991328953827,-0.000300653514269367,1.50969613210241e-18,0.000465978441137468,0.00102258147190892,0.00155366635073282,0.00192784355834049,0.00203610307379658,0.00183119111593167,0.00135603855040258,0.000749280342023432,0.000220958680427305,-2.30998316092680e-19,0.000264751350126403,0.00107567949517942,0.00233229627684471,0.00377262258405226,0.00502311871694995,0.00569227410155340,0.00548603174290836,0.00431270688583350,0.00234309825736876,0,-0.00213082326080853,-0.00345315860003227,-0.00353962427138790,-0.00228740687362881,3.04497082814396e-18,0.00264042059820580,0.00471756289619728,0.00531631859929438,0.00379212348265709,-1.99178361782373e-17,-0.00558925290045386,-0.0119350370250123,-0.0176440086545525,-0.0213191620435004,-0.0219592383672450,-0.0193021014035209,-0.0140079988312124,-0.00761010753938763,-0.00221480214028708,-3.05997847316821e-18,-0.00261988600696407,-0.0106615919949044,-0.0233019683686087,-0.0382766989959210,-0.0522058307502582,-0.0612344107673335,-0.0618649720104803,-0.0518011604210193,-0.0306049219949348,2.05563094310381e-17,0.0362729247397242,0.0730450660051671,0.104645449260725,0.125975754818137,0.133506082359307,0.125975754818137,0.104645449260725,0.0730450660051671,0.0362729247397242,2.05563094310381e-17,-0.0306049219949348,-0.0518011604210193,-0.0618649720104803,-0.0612344107673335,-0.0522058307502582,-0.0382766989959210,-0.0233019683686087,-0.0106615919949044,-0.00261988600696407,-3.05997847316821e-18,-0.00221480214028708,-0.00761010753938763,-0.0140079988312124,-0.0193021014035209,-0.0219592383672450,-0.0213191620435004,-0.0176440086545525,-0.0119350370250123,-0.00558925290045386,-1.99178361782373e-17,0.00379212348265709,0.00531631859929438,0.00471756289619728,0.00264042059820580,3.04497082814396e-18,-0.00228740687362881,-0.00353962427138790,-0.00345315860003227,-0.00213082326080853,0,0.00234309825736876,0.00431270688583350,0.00548603174290836,0.00569227410155340,0.00502311871694995,0.00377262258405226,0.00233229627684471,0.00107567949517942,0.000264751350126403,-2.30998316092680e-19,0.000220958680427305,0.000749280342023432,0.00135603855040258,0.00183119111593167,0.00203610307379658,0.00192784355834049,0.00155366635073282,0.00102258147190892,0.000465978441137468,1.50969613210241e-18,-0.000300653514269367,-0.000412991328953827,-0.000360951066953434,-0.000200360419689133,-4.62343304809110e-19,0.000175593510303356,0.000278146045925432,0.000281596242979397,0.000182981959336989};
-//        return MathArrays.convolve(sig,h);
         double[] filtout = fir(sig,h);
         return Utils.segment(filtout,63,filtout.length-1);
     }
@@ -1107,35 +1029,6 @@ public class Utils {
         }
         return out;
     }
-
-    public static double[] mult(double[] sig, double val) {
-        double[] out = new double[sig.length];
-        for (int i = 0; i < sig.length; i++) {
-            out[i] = sig[i]*val;
-        }
-        return out;
-    }
-
-    public static int[] random_bins() {
-        Random random = new Random();
-        int range = (Constants.nbin2_default -Constants.nbin1_default)+1;
-
-        int[] out = new int[2];
-        out[0] = random.nextInt(range)+Constants.nbin1_default;
-
-        int next = random.nextInt(range)+Constants.nbin1_default;
-        while (next == out[0]) {
-            next = random.nextInt(range)+Constants.nbin1_default;
-        }
-        out[1] = next;
-
-        if (out[1] < out[0]) {
-            return new int[]{out[1],out[0]};
-        }
-
-        return out;
-    }
-
     public static int[] linspace(int start, int inc, int end) {
         int num=(end-start)/inc;
         int[] out = new int[num];
@@ -1143,43 +1036,6 @@ public class Utils {
             out[i] = start+(inc*i);
         }
         return out;
-    }
-
-    public static double[] movingaverage(double[] spectrum, int windowsize) {
-
-        int counter = 0;
-
-        double[] movmean=new double[spectrum.length];
-
-        try {
-            double accum=0;
-            int ws=2;
-            for (int j = 0; j < ws; j++) {
-                accum+=spectrum[j];
-            }
-
-            for (int i = 0; i < windowsize-2; i++) {
-                movmean[counter++]=accum/ws;
-                accum+=spectrum[ws];
-                ws+=1;
-            }
-
-            int toDecrement=0;
-            movmean[counter++]=accum/windowsize;
-            for (int i = 1; i < spectrum.length-windowsize+1; i++) {
-                accum-=spectrum[toDecrement];
-                toDecrement+=1;
-                accum+=spectrum[toDecrement+windowsize-1];
-                movmean[counter++]=accum/windowsize;
-            }
-            accum-=spectrum[toDecrement];
-            movmean[counter]=accum/(windowsize-1);
-        }
-        catch (Exception e) {
-            e.printStackTrace();
-        }
-
-        return movmean;
     }
 
     public static String getDirName() {
