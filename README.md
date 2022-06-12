@@ -22,7 +22,7 @@ We have documented areas of the code that correspond to key system components in
 | Encoding feedback (Bob)    | [Code](smartphone/OceanRealDemo/app/src/main/java/com/example/root/ffttest2/SendChirpAsyncTask.java)       |
 | Decoding feedback  (Alice)    | [Code](smartphone/OceanRealDemo/app/src/main/java/com/example/root/ffttest2/SendChirpAsyncTask.java)       |
 | Encoding data packet (Alice)     | [Code](smartphone/OceanRealDemo/app/src/main/java/com/example/root/ffttest2/SendChirpAsyncTask.java)       |
-| Decoding data packet (Bob)     | [Code](smartphone/OceanRealDemo/app/src/main/java/com/example/root/ffttest2/SendChirpAsyncTask.java)       |
+| Decoding data packet (Bob)     | [Code](smartphone/OceanRealDemo/app/src/main/java/com/example/root/ffttest2/Decoder.java#L6)       |
 
 ![Screenshot from 2022-06-11 16-47-43](https://user-images.githubusercontent.com/174899/173208477-57eb4fb3-68ce-4651-afed-27ace099da47.png)
 
