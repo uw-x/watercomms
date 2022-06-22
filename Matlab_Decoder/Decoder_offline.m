@@ -3,7 +3,9 @@ close all
 % clc
 
 %% read the raw data
-folder_name = 'raw_data/bridge/';
+%folder_name = '../watercomms/exp_lake/per20_2/7/sync_file/';
+folder_name= 'raw_data/envs/park_5m/';
+
 pakcets_to_check = 0:130; %% the packet index to decode
 visual_debug = 0; % enable this to visualize the modulation process
 
@@ -13,9 +15,10 @@ visual_debug = 0; % enable this to visualize the modulation process
 mode = 1; % just to use mode=1
 
 %% configuration of OFDM symbols
-Ns=960; %length of OFDM symbol
-fs=48e3; % sampling rate
-inc=fs/Ns; % frequency spacing
+Ns = 960; %length of OFDM symbol
+fs = 48e3; % sampling rate
+inc = fs/Ns; % frequency spacing
+
 % length of cyclic prefix
 if Ns==960
     Ncs=67;
@@ -30,11 +33,19 @@ CP = Ncs;
 sym_len=Ns+Ncs; %length of symbol
 first_gap = 960; % zero interval between preamble and OFDM symbol
 
-tap_num = 480;% length of equalizer 
-offset = 60 ; % add some offset during equalization
-fre_offset = 20; % add some offset during equalization
-
-
+if Ns == 960
+    tap_num = 480;% length of equalizer 
+    offset = 100; % add some offset during equalization 60
+    fre_offset = 20; % add some offset during equalization
+elseif Ns == 1920
+    tap_num = 720;% length of equalizer 
+    offset = 100; % add some offset during equalization 60
+    fre_offset = 20; % add some offset during equalization
+elseif Ns == 4800
+    tap_num = 960;% length of equalizer 
+    offset = 100; % add some offset during equalization 60
+    fre_offset = 20; % add some offset during equalization
+end
 
 % read the preamble
 preamble=dlmread('sending_signal/preamble')/30000;
@@ -68,7 +79,6 @@ uncode_data_gt0  =dlmread(strcat('sending_signal/uncode_data_', int2str(code_rat
 
 
 for r = pakcets_to_check
-
     if(~exist(strcat(folder_name, 'Alice-DataAdapt-',int2str(r),'.txt'), 'file'))
         disp(strcat('No such file!:  ', folder_name, 'Alice-DataAdapt-',int2str(r),'.txt'))
         continue
@@ -125,13 +135,24 @@ for r = pakcets_to_check
     if(mode == 1)
         freq_name = strcat('Bob-FreqEsts-',int2str(r),'.txt');
         freq_name2 = strcat('Alice-FeedbackFreqs-',int2str(r),'.txt');
+        
+        freq_name3 = strcat('Alice-ExactFeedbackFreqs-',int2str(r),'.txt');
         freq_est = dlmread(strcat(folder_name, freq_name));
         freq_send = dlmread(strcat(folder_name, freq_name2));
-        if(freq_send(1) == -1 || freq_send(2) == -1 ||  freq_send(2) == freq_send(1) || abs(freq_est(2) -freq_send(2)) > 100 || abs(freq_est(1) -freq_send(1)) > 100 )
+
+        if(freq_send(1) == -1 || freq_send(2) == -1 || abs(freq_est(2) -freq_send(2)) > 100 || abs(freq_est(1) -freq_send(1)) > 100 ) % freq_send(2) == freq_send(1)
             disp(strcat('error frequenct and FSK in Packet:', int2str(r)))
             continue;
         end
-        f_range = [freq_send(1), freq_send(2)]; %600
+
+        if(exist(strcat(folder_name, freq_name3), 'file'))
+            freq_exact = dlmread(strcat(folder_name, freq_name3));
+            f_range = [freq_exact(1), freq_exact(end)];
+        else
+            f_range = [freq_send(1), freq_send(2)]; %600
+        end
+
+        
     elseif(mode == 2)
         f_range = [1000, 4000 - 50];
     elseif(mode == 3)
@@ -165,7 +186,7 @@ for r = pakcets_to_check
     %%  ------------------------- begin demodulation -----------------------------
     filter_order = 96;
     blocklen=length(preamble)+ first_gap + sym_len*(Nsyms);  %% the length of entire packets
-    locs = find_symbol(dat,preamble,fs,r,visual_debug,mode);
+    locs = find_symbol(dat,preamble,fs,r,visual_debug,mode, Ns);
     idx = locs + 1;
     %% segment the entire packet from the recv wave
     if(blocklen +filter_order + tap_num + idx > length(dat))
@@ -324,7 +345,7 @@ for r = pakcets_to_check
         signal_level = mean(abs(spect_rx), 2);
         figure
         hold on
-        plot(f_seq(1000/inc+1:4000/inc), SNR_phone)
+        plot(f_seq(1000/inc+1:2500/inc), SNR_phone) 
         plot([f_range(1), f_range(1) ], [-10, 10], 'r--')
         plot([f_range(2), f_range(2) ], [-10, 10], 'r--')
         plot(f_seq, mag2db(signal_level))

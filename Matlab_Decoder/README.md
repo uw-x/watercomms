@@ -8,13 +8,17 @@ It contains the original sending preamble and sending bits with differen convolu
 ### ./raw_data
 We have some sample data collected from the real world. For each setting, there are around 100-130 packets.
 
-(1) "./raw_data/bridge" is colected in a long bridge in the Washington Lake with 5m horizontal distance 
+(1) "./raw_data/envs" is the data colected in different environments: (1) a long bridge in the Washington Lake (2) gas station park (3) a fishing platform of Green lake (4) a harbor with deep water (~10m deep)
 
-(2) "./raw_data/lake"  is colected in a fishing platform of Green Lake with 5m horizontal distance
+(2) "./raw_data/dis/"  is the data colected in a fishing platform of Green Lake with different horizontal distance (5m, 10m, 20m, 30m)
 
-(3) "./raw_data/harbor" is colected in a deep and busy harbor near the Lake Union Bay with 5m horizontal distance  
+(3) "./raw_data/depth" is colected in a deep and busy harbor near the Lake Union Bay with different depth (2m, 5m, 7m)
 
-(4) "./raw_data/lake_20m" is colected in a fishing platform of Green Lake with 20m horizontal distance
+(4) "./raw_data/motion" is colected in a fishing platform of Green Lake with different motion speed
+
+(5) "./raw_data/rot" is colected in a long bridge in the Washington Lake with different phone orientation
+
+(6) "./raw_data/Ns" is colected in a Green Lake with different OFDM symbol length (960, 1920, 4800). Be careful, when change to differnt Ns, also change the Ns in line 18
 
 ### Matlab decoder
 (1) Decoder_offline.m is the main function code for our decoding and demodulation process

@@ -1,4 +1,4 @@
-function [new_locs] = find_symbol(dat,preamble, fs, r, visual_debug, mode)
+function [new_locs] = find_symbol(dat,preamble, fs, r, visual_debug, mode, Ns)
     f_begin = 1000;
     f_end = 4000;
     N_pre = length(preamble);
@@ -25,8 +25,17 @@ function [new_locs] = find_symbol(dat,preamble, fs, r, visual_debug, mode)
     [locs,idx]=sort(locs);
     pks=pks(idx);
     win_size = 1000;
-    max_p = 100; %130 5 - 87;
-    threshold = 0.5;
+    if Ns == 960
+        max_p = 150; %100
+        threshold = 0.5;
+    elseif Ns == 1920
+        max_p = 80; %100
+        threshold = 0.5;
+    elseif Ns == 4800
+        max_p = 80; %100
+        threshold = 0.5;
+    end
+    
     mets=[];
     locs2=[];
     pks2=[];
@@ -63,6 +72,11 @@ function [new_locs] = find_symbol(dat,preamble, fs, r, visual_debug, mode)
         locs2(remove_idx)=[];
     end
 
+%     figure
+%     hold on
+%     plot(acor)
+%     scatter(locs2, pks2)
+
     %% sync use channel estimation
     seek_back = 960;
     p_threshold = 0.4;
@@ -77,8 +91,23 @@ function [new_locs] = find_symbol(dat,preamble, fs, r, visual_debug, mode)
     end_i = round(f_end/delta_f);
     H(begin_i:end_i) = Y(begin_i:end_i)./(X(begin_i:end_i));
     h = ifft(H);
-
+    
     [ h, path1, path1_new, noise_level] = channe_look_back( h, 0.35, 5, 1); % find the earlist channel peak
     new_locs = lag(new_locs1)-offset2+path1_new+offset;
-
+    
+    if(visual_debug)
+        figure
+        subplot(211)
+        hold on
+        plot(acor)
+        scatter(locs2,acor(locs2));
+        scatter(new_locs1,acor(new_locs1), 'gx');
+        title(int2str(r))
+        subplot(212)
+        plot(h)
+        hold on
+        yline(noise_level)
+        scatter(path1, h(path1), 'rx')
+        scatter(path1_new, h(path1_new), 'g^')
+    end
 end
