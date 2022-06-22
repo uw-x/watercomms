@@ -95,19 +95,5 @@ function [new_locs] = find_symbol(dat,preamble, fs, r, visual_debug, mode, Ns)
     [ h, path1, path1_new, noise_level] = channe_look_back( h, 0.35, 5, 1); % find the earlist channel peak
     new_locs = lag(new_locs1)-offset2+path1_new+offset;
     
-    if(visual_debug)
-        figure
-        subplot(211)
-        hold on
-        plot(acor)
-        scatter(locs2,acor(locs2));
-        scatter(new_locs1,acor(new_locs1), 'gx');
-        title(int2str(r))
-        subplot(212)
-        plot(h)
-        hold on
-        yline(noise_level)
-        scatter(path1, h(path1), 'rx')
-        scatter(path1_new, h(path1_new), 'g^')
-    end
+
 end

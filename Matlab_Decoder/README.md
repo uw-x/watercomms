@@ -6,7 +6,8 @@
 It contains the original sending preamble and sending bits with different convolutional code rate 
 
 ### ./raw_data
-We have some sample data collected from the real world. For each setting, there are around 80-130 packets. (Specially, For the rotation experiment, each angle contains ~30 packets)
+We have some sample data collected from the real world 
+[available](https://drive.google.com/file/d/1igOAE6DJlwaoYYYSf-DC3BWZSFCljema/view?usp=sharing). For each setting, there are around 80-130 packets. (Specially, For the rotation experiment, each angle contains ~30 packets)
 
 (1) "./raw_data/envs" is the data colected in different environments: (1) a long bridge in the Washington Lake (2) gas station park (3) a fishing platform of Green lake. (Fig.9) 
 
