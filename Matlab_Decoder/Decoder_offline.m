@@ -3,7 +3,7 @@ close all
 % clc
 
 %% read the raw data
-%folder_name = '../watercomms/exp_lake/per20_2/7/sync_file/';
+
 folder_name= 'raw_data/envs/park_5m/';
 
 pakcets_to_check = 0:130; %% the packet index to decode

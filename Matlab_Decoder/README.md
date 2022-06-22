@@ -3,22 +3,22 @@
 ## Overview
 
 ### ./sending_signal
-It contains the original sending preamble and sending bits with differen convolutional code rate 
+It contains the original sending preamble and sending bits with different convolutional code rate 
 
 ### ./raw_data
-We have some sample data collected from the real world. For each setting, there are around 100-130 packets.
+We have some sample data collected from the real world. For each setting, there are around 80-130 packets. (Specially, For the rotation experiment, each angle contains ~30 packets)
 
-(1) "./raw_data/envs" is the data colected in different environments: (1) a long bridge in the Washington Lake (2) gas station park (3) a fishing platform of Green lake (4) a harbor with deep water (~10m deep)
+(1) "./raw_data/envs" is the data colected in different environments: (1) a long bridge in the Washington Lake (2) gas station park (3) a fishing platform of Green lake. (Fig.9) 
 
-(2) "./raw_data/dis/"  is the data colected in a fishing platform of Green Lake with different horizontal distance (5m, 10m, 20m, 30m)
+(2) "./raw_data/dis/"  is the data colected in a fishing platform of Green Lake with different horizontal distance (5m, 10m, 20m, 30m) (Fig.11)
 
-(3) "./raw_data/depth" is colected in a deep and busy harbor near the Lake Union Bay with different depth (2m, 5m, 7m)
+(3) "./raw_data/depth" is colected in a deep and busy harbor near the Lake Union Bay with different depth (2m, 5m, 7m) (Fig.10)
 
-(4) "./raw_data/motion" is colected in a fishing platform of Green Lake with different motion speed
+(4) "./raw_data/motion" is colected in a fishing platform of Green Lake with different motion speed (Fig.13)
 
-(5) "./raw_data/rot" is colected in a long bridge in the Washington Lake with different phone orientation
+(5) "./raw_data/rot" is colected in a long bridge in the Washington Lake with different phone orientation (Fig.14)
 
-(6) "./raw_data/Ns" is colected in a Green Lake with different OFDM symbol length (960, 1920, 4800). Be careful, when change to differnt Ns, also change the Ns in line 18
+(6) "./raw_data/Ns" is colected in a Green Lake with different OFDM symbol length (960, 1920, 4800). Be careful, when change to differnt Ns, also change the Ns in line 18 of Decoder_offline.m (Fig.16)
 
 ### Matlab decoder
 (1) Decoder_offline.m is the main function code for our decoding and demodulation process
@@ -39,10 +39,10 @@ We run our code in Matlab 2021b Version
 
 Run code "Decoder_offline.m", the PER and BER will be printed in the console and a CDF figure for data rate will come out.
 
-change folder_name in line 6 to select which raw data to load
+change folder_name in line 7 to select which raw data to load
 
-change pakcets_to_check in line 7 to select the packet index to be decoded
+change pakcets_to_check in line 9 to select the packet index to be decoded
 
-change visual_debug in line 8 to 1, then the figure of time-domain signal, spectrum of recv signal, equilizer, error bits will be visualized and more debug information will be printed. (Caution!!: do not enbale visual_debug when pakcets_to_check contains large number of packets, because the visulaization process may occupy too much CPU and memory. Instead, you can set pakcets_to_check to index of only one packet and then enable visual_debug.)
+change visual_debug in line 10 to 1, then the figure of time-domain signal, spectrum of recv signal, equilizer, error bits will be visualized and more debug information will be printed. (Caution!!: do not enbale visual_debug when pakcets_to_check contains large number of packets, because the visulaization process may occupy too much CPU and memory. Instead, you can set pakcets_to_check to index of only one packet and then enable visual_debug.)
 
 
