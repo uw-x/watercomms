@@ -115,7 +115,7 @@ public class Constants {
     static int WaitForPerTimeDefault = 4;
 
     static int RecorderStepSize = 24000;
-    static float NaiserThresh = .5f;
+    static float NaiserThresh = .6f;
     static double WaitForFeedbackTime;
     static double WaitForSoundingTime;
     static double WaitForBerTime;

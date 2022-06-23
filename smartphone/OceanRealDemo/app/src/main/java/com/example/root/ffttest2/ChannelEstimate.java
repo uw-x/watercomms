@@ -41,7 +41,7 @@ public class ChannelEstimate {
         int cc=Constants.Cp;
         double [][][] spec_est = new double[2][Constants.subcarrier_number_default][Constants.chanest_symreps];
         for (int i = 0; i < Constants.chanest_symreps; i++) {
-            Log.e("asdf","fft");
+            Log.e("asdf","fft "+cc+","+(cc+Constants.Ns-1)+","+rx_symbols.length);
             double[] seg = Utils.segment(rx_symbols,cc,cc+Constants.Ns-1);
             double[][] spec = Utils.fftcomplexoutnative_double(seg,seg.length);
 
