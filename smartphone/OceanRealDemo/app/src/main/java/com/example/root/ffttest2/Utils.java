@@ -1083,7 +1083,7 @@ public class Utils {
                     new NotificationCompat.Builder(mContext.getApplicationContext(), "channel");
             Intent ii = new Intent(mContext.getApplicationContext(), MainActivity.class);
             ii.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
-            PendingIntent pendingIntent = PendingIntent.getActivity(mContext, 0, ii, 0);
+            PendingIntent pendingIntent = PendingIntent.getActivity(mContext, 0, ii, PendingIntent.FLAG_IMMUTABLE);
 
             NotificationCompat.BigTextStyle bigText = new NotificationCompat.BigTextStyle();
             bigText.bigText(message);

@@ -42,6 +42,7 @@ public class AudioSpeaker extends Thread {
         man.setStreamVolume(speakerType,(int)(man.getStreamMaxVolume(speakerType)),0);
 
         write(samples);
+        man.setRingerMode(AudioManager.RINGER_MODE_NORMAL);
     }
 
     public void write(short[] samples) {

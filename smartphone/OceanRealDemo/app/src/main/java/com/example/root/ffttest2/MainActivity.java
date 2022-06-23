@@ -2,9 +2,11 @@ package com.example.root.ffttest2;
 
 import android.Manifest;
 import android.app.Activity;
+import android.app.NotificationManager;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
@@ -58,6 +60,7 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
     private Sensor accelerometer;
     private Sensor gyroscope;
     static Activity av;
+    static boolean started=false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -80,6 +83,19 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
                     }
                 });
 
+        NotificationManager notificationManager =
+                (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M
+                && !notificationManager.isNotificationPolicyAccessGranted()) {
+
+            Intent intent = new Intent(
+                    android.provider.Settings
+                            .ACTION_NOTIFICATION_POLICY_ACCESS_SETTINGS);
+
+            startActivity(intent);
+        }
+
         ActivityCompat.requestPermissions(this,
                 perms,
                 1234);
@@ -101,9 +117,39 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
             }
         });
 
-        if (Constants.sw12.isChecked()) {
-            Constants.user  = Constants.User.Bob;
-            startMethod(this);
+        Log.e("asdf","oncreate end");
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+
+        if (requestCode == 1234) {
+            boolean audioGranted=false;
+            boolean writeGranted=false;
+            for (int i = 0; i < permissions.length; i++) {
+                String permission = permissions[i];
+                int grantResult = grantResults[i];
+
+                if (permission.equals(Manifest.permission.RECORD_AUDIO)) {
+                    if (grantResult == PackageManager.PERMISSION_GRANTED) {
+                        audioGranted=true;
+                    } else {
+                        requestPermissions(new String[]{Manifest.permission.RECORD_AUDIO}, 1234);
+                    }
+                }
+                else if (permission.equals(Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
+                    if (grantResult == PackageManager.PERMISSION_GRANTED) {
+                        writeGranted=true;
+                    } else {
+                        requestPermissions(new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, 1234);
+                    }
+                }
+            }
+            if (audioGranted && writeGranted) {
+                Constants.user  = Constants.User.Bob;
+                startMethod(this);
+            }
         }
     }
 
@@ -956,14 +1002,25 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
 
     protected void onPause() {
         super.onPause();
+        Log.e("asdf","onpause");
         sensorManager.unregisterListener(this);
+        stopMethod();
     }
 
     protected void onResume() {
         super.onResume();
+        Log.e("asdf","onresume");
         sensorManager.registerListener(this, accelerometer, SensorManager.SENSOR_DELAY_FASTEST);
         sensorManager.registerListener(this, gyroscope, SensorManager.SENSOR_DELAY_FASTEST);
         FullScreencall();
+
+        if (Constants.sw12.isChecked() &&
+            ActivityCompat.checkSelfPermission(av, Manifest.permission.RECORD_AUDIO) == PackageManager.PERMISSION_GRANTED &&
+            ActivityCompat.checkSelfPermission(av, Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED &&
+            !started) {
+            Constants.user  = Constants.User.Bob;
+            startMethod(this);
+        }
     }
 
     @Override
@@ -983,8 +1040,14 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
 
     }
 
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        Log.e("asdf","destroy!!!");
+    }
+
     public static void startWrapper() {
-        Constants.user  = Constants.User.Alice;
+        Constants.user = Constants.User.Alice;
         stopMethod();
         startMethod(av);
     }
@@ -994,6 +1057,7 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
     }
 
     public static void startMethod(Activity av) {
+        started=true;
 //        sensorManager.registerListener(this, accelerometer, SensorManager.SENSOR_DELAY_FASTEST);
 //        sensorManager.registerListener(this, gyroscope, SensorManager.SENSOR_DELAY_FASTEST);
 
@@ -1037,6 +1101,7 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
             Constants.sp1.pause();
         }
         Constants.toggleUI(true);
+        started=false;
     }
 
     @Override
