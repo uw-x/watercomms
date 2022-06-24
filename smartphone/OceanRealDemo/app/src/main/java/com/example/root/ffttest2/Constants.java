@@ -141,7 +141,7 @@ public class Constants {
     public static int mattempts=1;
     public static long ts;
     public static Button startButton,clearButton,stopButton;
-    public static float volume=0.2f;
+    public static float volume=0.6f;
     public static TextView tv1,tv2,tv3,tv4, debugPane,tv5,tv6,tv7,tv8,tv9,tv10,tv13,tv14,tv15,tv16,tv17,tv18,tv19,tv20,tv21,msgview;
     public static NestedScrollView sview;
     public static CountDownTimer timer;
