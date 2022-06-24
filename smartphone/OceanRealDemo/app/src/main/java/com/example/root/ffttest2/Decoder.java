@@ -72,13 +72,13 @@ public class Decoder {
         if (Constants.mmap.containsKey(messageID)) { message = Constants.mmap.get(messageID); }
         Utils.log(coded +"=>"+uncoded+"=>"+message);
 
-//        String finalMessage = message;
-//        av.runOnUiThread(new Runnable() {
-//            @Override
-//            public void run() {
+        String finalMessage = message;
+        av.runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
 //                Utils.sendNotification(av, "Notification",finalMessage, R.drawable.warning2);
-//                Constants.msgview.setText(finalMessage);
-//            }
-//        });
+                Constants.msgview.setText(finalMessage);
+            }
+        });
     }
 }
