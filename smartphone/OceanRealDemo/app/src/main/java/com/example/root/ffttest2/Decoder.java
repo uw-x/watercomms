@@ -76,7 +76,7 @@ public class Decoder {
         av.runOnUiThread(new Runnable() {
             @Override
             public void run() {
-//                Utils.sendNotification(av, "Notification",finalMessage, R.drawable.warning2);
+                Utils.sendNotification(av, "Notification",finalMessage, R.drawable.warning2);
                 Constants.msgview.setText(finalMessage);
             }
         });
