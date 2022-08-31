@@ -50,6 +50,9 @@ public class Utils {
         (MainActivity.av).runOnUiThread(new Runnable() {
             @Override
             public void run() {
+                if (Constants.debugPane.getText().toString().length() > 400){
+                    Constants.debugPane.setText("");
+                }
                 Constants.debugPane.setText(Constants.debugPane.getText()+"\n"+s);
                 scrollToBottom();
             }
